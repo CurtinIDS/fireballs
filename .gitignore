@@ -1,0 +1,17 @@
+# Project generated files #
+*.pyc
+cache/*
+data/*
+output/*
+tf_files/*
+.ipynb_checkpoints*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+thumbs.db
+Thumbs.db

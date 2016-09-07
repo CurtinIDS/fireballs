@@ -1,0 +1,27 @@
+Wooleen:
+
+SITELAT =           -27.089095                                                  
+SITELONG=           116.157925                                                  
+SITEALT =                300.0 
+
+ASTROSMALL01
+100x80 deg FoV still camera (13' exposures), pointing up  
+
+DFNSMALL49
+all-sky still camera (25' exposures)
+
+---------------------------------------------------------------
+
+Mount Narryer:
+
+SITELAT =           -26.512815                                                  
+SITELONG=            116.36568                                                  
+SITEALT =                340.0
+
+ASTROSMALL00_mobile
+100x80 deg FoV still camera (13' exposures), pointing to various regions of the sky
+
+DFNSMALL33
+all-sky still camera (25' exposures)
+
+
