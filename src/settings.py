@@ -10,6 +10,7 @@ RESULTS_DIRECTORY = '../results/'
 # Experiment
 CAMERAS = ['astrosmall00_mobile', 'astrosmall01', 'dfnsmall33', 'dfnsmall49']
 EXPERIMENT_NAME = CAMERAS[0]
+# EXPERIMENT_NAME = 'all'
 EXPERIMENT_TYPE = 'retrained'
 EXPERIMENT_PREFIX = EXPERIMENT_NAME + '_' + EXPERIMENT_TYPE
 TRAINING_STEPS = 6000
