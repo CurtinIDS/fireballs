@@ -6,9 +6,13 @@ from __future__ import print_function
 
 import time
 import os
+import fnmatch
+import numpy as np
 import pandas as pd
 import settings as s
-import fnmatch
+
+from skimage import io
+
 
 
 def main():  
@@ -35,6 +39,9 @@ def main():
     # 2. Data preparation
     # 
 
+    #    
+    # 2a. Remove meteor images from the not meteors folder
+    # 
     data_prep_time = time.time()
     print('\nPrepare data:')
 
@@ -69,7 +76,40 @@ def main():
         # Track the number of images removed
         removed_images += (file_count - len(fnmatch.filter(os.listdir(directory_path), '*.jpg')))
 
+
+    #    
+    # 2b. Crop meteor images based on bounding box coordinates
+    # 
+    
+    # TODO
+    # 1. Add code to handle saving multiple meteors for a single image
+    # 
+
+    # Modify the image column to include the filepath to the not meteors folder    
+    df['file'] = s.DATA_DIRECTORY + df['camera'] + '/meteors/' + df['image'].astype(str)
+
+    # Create the folders in the cache directory if they don't already exist
+    for camera in cameras:
+        camera_folder = s.CACHE_DIRECTORY + camera + '/meteors'
+
+        if not os.path.exists(camera_folder):
+            os.makedirs(camera_folder)
+
+    for index, meteor in df.iterrows():        
+        # Read in the meteor image
+        image = io.imread(meteor['file'])
+
+        # Crop the image based on the bounding box coordinates
+        cropped_image = image[meteor['y1']:meteor['y2'], meteor['x1']:meteor['x2'], :]
+
+        # Output filename
+        filename = s.CACHE_DIRECTORY + meteor['camera'] + '/meteors/' + meteor['image']
+
+        # Save the cropped image to disk
+        io.imsave(filename, cropped_image)
+
     print('  removed from non-meteor folder: %d images' % (removed_images))
+    print('  meteors cropped: %d images' % (len(df)))
     print('  time taken: %.3f seconds' % (time.time() - data_prep_time))
 
 
