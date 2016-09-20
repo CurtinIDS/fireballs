@@ -96,7 +96,7 @@ def main():
         image = io.imread(meteor['file'])
 
         # Crop the image based on the bounding box coordinates
-        cropped_image = image[meteor['y1']:meteor['y2'], meteor['x1']:meteor['x2'], :]
+        cropped_image = image[meteor['y0']:meteor['y1'], meteor['x0']:meteor['x1'], :]
 
         # Output filename
         filename = s.CACHE_DIRECTORY + meteor['camera'] + '/meteors/'
