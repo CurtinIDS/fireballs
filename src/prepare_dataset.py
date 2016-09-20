@@ -80,20 +80,16 @@ def main():
     #    
     # 2b. Crop meteor images based on bounding box coordinates
     # 
-    
-    # TODO
-    # 1. Add code to handle saving multiple meteors for a single image
-    # 
-
+   
     # Modify the image column to include the filepath to the not meteors folder    
-    df['file'] = s.DATA_DIRECTORY + df['camera'] + '/meteors/' + df['image'].astype(str)
+    df['file'] = s.DATA_DIRECTORY + 'raw/' + df['camera'] + '/meteors/' + df['image'].astype(str)
 
     # Create the folders in the cache directory if they don't already exist
     for camera in cameras:
         camera_folder = s.CACHE_DIRECTORY + camera + '/meteors'
 
         if not os.path.exists(camera_folder):
-            os.makedirs(camera_folder)
+            os.makedirs(camera_folder) 
 
     for index, meteor in df.iterrows():        
         # Read in the meteor image
@@ -103,8 +99,15 @@ def main():
         cropped_image = image[meteor['y1']:meteor['y2'], meteor['x1']:meteor['x2'], :]
 
         # Output filename
-        filename = s.CACHE_DIRECTORY + meteor['camera'] + '/meteors/' + meteor['image']
-
+        filename = s.CACHE_DIRECTORY + meteor['camera'] + '/meteors/'
+        
+        # add a filename suffix for the images containing more than one meteor 
+        if np.isnan(meteor['suffix']):
+            filename += meteor['image']        
+        else:
+            filename_parts = meteor['image'].split('.')
+            filename += filename_parts[0] + '_' + str(int(meteor['suffix'])) + '.' + filename_parts[1] + '.' + filename_parts[2]
+            
         # Save the cropped image to disk
         io.imsave(filename, cropped_image)
 
