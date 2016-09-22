@@ -12,12 +12,10 @@ from __future__ import print_function
 import time
 import os
 import fnmatch
-import numpy as np
 import pandas as pd
 import settings as s
 
 from skimage import io
-from collections import namedtuple
 
 
 def main():  
