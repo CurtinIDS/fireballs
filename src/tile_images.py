@@ -1,13 +1,16 @@
 """
 Split the dataset images into tiles for fireballs detection
 
+This script is used for when tile coordinates have been precomputed and populated 
+to data/meteors.csv. Otherwise, run the initial_tile_images.py and meteor_grids.py 
+scripts to extract tile coordinates for images labelled as containing meteor(s).
+
 """
 from __future__ import print_function
 
 import time
 import os
 import fnmatch
-import numpy as np
 import pandas as pd
 import settings as s
 
@@ -26,10 +29,10 @@ def main():
     data_load_time = time.time()
     print('\nLoad data:')
 
-    # load the data file
+    # load the meteors data file
     meteors = pd.read_csv(s.DATA_FILE, index_col=False)
 
-    # Retrieve image filenames in the dataset
+    # Retrieve image filenames in the dataset directory
     images = [[os.path.join(dirpath, f)]
               for dirpath, dirnames, files in os.walk(s.DATA_DIRECTORY)
               for f in fnmatch.filter(files, '*.jpg')] 
@@ -38,13 +41,29 @@ def main():
     df = pd.DataFrame.from_records(images)
     df.rename(columns={0: 'file'}, inplace=True)
 
-    # Extract the relevant information from the image filenames
+    # Extract relevant information from the image filenames
     df['temp'] = df['file'].str.split('/')
     df['image'] = df['temp'].str[4]
     df['camera'] = df['temp'].str[2]
     df['label'] = df['temp'].str[3]
     df.drop('temp', axis=1, inplace=True)
 
+    # Filter tiling to a specific camera
+    # df = df[df['camera'] == s.CAMERAS[0]]
+    
+    # Only select a number of non meteor images for creating background tiles
+    required_images = 10
+
+    # Created a background tiles dataframe containing only selected images
+    background_df = df[df['label'] == 'none']
+    step = len(background_df) / required_images
+    indices = [i + (i * step) for i in range(required_images)]
+    background_df = background_df.iloc[indices]
+
+    # Append the selected background images to the meteors dataframe
+    df = df[df['label'] == 'meteors']
+    df = df.append(background_df)
+  
     print('  # images: %d ' % (len(images)))
     print('  # meteors: %d ' % (len(meteors)))
     print('  time taken: %.3f seconds' % (time.time() - data_load_time))
@@ -79,6 +98,7 @@ def main():
     height = int(image.shape[0] / rows)
     width = int(image.shape[1] / cols)
     
+    # TODO: parallelise tiling of images
     # Generate image tiles
     for index, image in df.iterrows():
 
@@ -89,9 +109,12 @@ def main():
         filename = image['image']
         filename_parts = filename.split('.')
         
-        # Get the bounding box coordinates of meteor(s) in this image
+        # Check if this image contains meteors
         image_meteors = meteors[meteors['image'] == filename]
 
+        # Tile coordinates are known from the meteors data file
+        meteor_tiles = ','.join(image_meteors['tiles'].values).strip().split(',')
+        
         # Generate tiles for each row and column 
         for row in range(rows):
             for col in range(cols):
@@ -102,56 +125,18 @@ def main():
                 y0 = row * height
                 y1 = y0 + height
 
-                # Default to no meteors for the tile
+                # Default to no meteors category for the tile
                 label = 'none'
 
-                # Determine if this tile contains a meteor
+                # Image has been labelled to contain meteor(s)
                 if len(image_meteors):
-                   
-                    # Loop through the list of meteors
-                    for index, image_meteor in image_meteors.iterrows():
-                        
-                        # Compare tile and meteor bounding box coordinates
-                        has_meteor = False
 
-                        # Top left grid
-                        if (x0 <= image_meteor['x0'] and y0 <= image_meteor['y0'] and 
-                                x1 >= image_meteor['x0'] and y1 >= image_meteor['y0']):
-                            has_meteor = True
-                        # Top grid
-                        elif (x0 >= image_meteor['x0'] and y0 <= image_meteor['y0'] and 
-                                x1 <= image_meteor['x1'] and y1 >= image_meteor['y0']):
-                            has_meteor = True
-                        # Top right grid
-                        elif (x0 <= image_meteor['x1'] and y0 <= image_meteor['y0'] and 
-                                x1 >= image_meteor['x1'] and y1 >= image_meteor['y0']):
-                            has_meteor = True
-                        # Middle left grid
-                        elif (x0 <= image_meteor['x0'] and y0 >= image_meteor['y0'] and 
-                                x1 >= image_meteor['x0'] and y1 <= image_meteor['y1']):
-                            has_meteor = True    
-                        # Middle grid
-                        elif (x0 >= image_meteor['x0'] and y0 >= image_meteor['y0'] and 
-                                x1 <= image_meteor['x1'] and y1 <= image_meteor['y1']):
-                            has_meteor = True
-                        # Middle right grid
-                        elif (x0 <= image_meteor['x1'] and y0 >= image_meteor['y0'] and 
-                                x1 >= image_meteor['x1'] and y1 <= image_meteor['y1']):
-                            has_meteor = True    
-                        # Bottom left grid
-                        elif (x0 <= image_meteor['x0'] and y0 <= image_meteor['y1'] and 
-                                x1 >= image_meteor['x0'] and y1 >= image_meteor['y1']):
-                            has_meteor = True
-                        # Bottom grid
-                        elif (x0 >= image_meteor['x0'] and y0 <= image_meteor['y1'] and 
-                                x1 <= image_meteor['x1'] and y1 >= image_meteor['y1']):
-                            has_meteor = True
-                        # Bottom right grid
-                        elif (x0 <= image_meteor['x1'] and y0 <= image_meteor['y1'] and
-                                x1 >= image_meteor['x1'] and y1 >= image_meteor['y1']):
-                            has_meteor = True
-
-                        if has_meteor:
+                    # Check if this tile has been labelled as a meteor tile
+                    for tile in meteor_tiles:
+                        if row == int(tile[0]) and col == int(tile[1]):
+                            # Remove the tile once it has been found
+                            meteor_tiles.remove(tile)
+                            # Set the tile label as a meteor tile
                             label = 'meteors'
 
                 # Generate the tile filename 
@@ -159,7 +144,7 @@ def main():
                 tile_filename += filename_parts[0] + '_' + str(row) + str(col)
                 tile_filename += '.' + filename_parts[1] + '.' + filename_parts[2]
 
-                # Save the tile image to disk
+                # Save the tile image to the correct labelled folder
                 io.imsave(tile_filename, image_data[y0:y1, x0:x1, :])
 
     print('  tiles created: %d images' % (len(df)))

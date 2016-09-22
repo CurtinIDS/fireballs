@@ -4,7 +4,7 @@ Split the dataset images into tiles for fireballs detection.
 This script is used for the initial run when tile coordinates 
 have not been precomputed and populated to data/meteors.csv. 
 Otherwise, run the tile_images.py script if the meteor tile
-coordinates have already been determined.
+coordinates have been determined.
 
 """
 from __future__ import print_function
