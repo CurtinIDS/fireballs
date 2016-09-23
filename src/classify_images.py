@@ -79,8 +79,8 @@ def main():
 
             # Extract the image info, top predicted class and confidence score
             label = top_k[0]
-            image_file = image.split('/')[3]
-            actual_class = image.split('/')[2]
+            image_file = image.split('/')[4]
+            actual_class = image.split('/')[3]
             label_name = labels[label]
             score = '%.5f' % (predictions[0][label])
 
@@ -90,7 +90,7 @@ def main():
                 'label': actual_class, 
                 'prediction': label_name, 
                 'confidence': score}, 
-                ignore_index=True)      
+                ignore_index=True)
 
     # Calculate the number of images classified into each class
     class_counts_df = output_df.groupby('prediction')['prediction'].count()
