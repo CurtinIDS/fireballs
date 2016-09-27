@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href='{{ url_for('static', filename='css/styles.css') }}' type="text/css" />
+    <link rel="stylesheet" href='{{ url_for('static', filename='css/sortable-theme-bootstrap.css') }}' type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{url_for('static', filename='js/lib/sortable.js')}}"></script>
+{% endblock %}
+
+{% block content %}
+
+<p><a href="/">Home</a> > Results: {{view}}</p>
+
+<h2>Predictions</h2>
+<p><strong>{{ '{0:,}'.format(fireballs|length) }} fireballs</strong> retrieved</p>
+
+{% if fireballs|length %}
+
+<table class="sortable-theme-bootstrap" data-sortable>
+    <thead>
+        <tr>
+            <th>File</th>
+            <th>Label</th>
+            <th>Prediction</th>
+            <th>Confidence</th>
+            <th data-sortable="false" class="middle">Image</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fireball in fireballs %}
+            {% set row_error = '' %}
+
+            {% if view != 'errors' %}
+                {% if fireball.label != fireball.prediction %}
+                    {% set row_error = ' class=error' %}
+                {% endif %}
+            {% endif %}
+
+        <tr{{row_error}}>
+            <td>{{ fireball.image }}</td>
+            <td>{{ fireball.label }}</td>
+            <td>{{ fireball.prediction }}</td>
+            <td>{{ '%0.1f' | format(fireball.confidence * 100) }}&#37;</td>
+            <td><a href="{{url_for('static', filename='img/astrosmall00_mobile/' + fireball.label + '/' + fireball.image)}}"><img class="thumbnail" src="{{url_for('static', filename='img/astrosmall00_mobile/' + fireball.label + '/' + fireball.image)}}" /></a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endif %}
+
+<br /> 
+
+{% endblock %}

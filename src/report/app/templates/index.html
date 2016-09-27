@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href='{{ url_for('static', filename='css/styles.css') }}' type="text/css" />
+{% endblock %}
+
+{% block content %}
+
+<h1>Fireball Detection</h1>
+
+<h2>Curtin Institute for Computation (CIC)</h2>
+<ul>
+    <li>Kevin Chai (k.chai@curtin.edu.au)</li>
+    <li>Shiv Meka (shiv.meka@curtin.edu.au)</li>
+</ul>
+<p>&nbsp;</p>
+
+<h2>Interactive Reports</h2>
+<ul>
+    <li><span class="large"><a href="results/all">All classifications</a></span></li>
+    <li><span class="large"><a href="results/errors">Errors only</a></span></li>
+</ul>
+<p>&nbsp;</p>
+
+<h2>Methods</h2>
+<ul>
+    <li>Machine learning / computer vision</li>
+    <li>Deep learning: Convolutional Neural Network (CNN)</li>
+    <li>Google TensorFlow</li>
+</ul>
+<p>&nbsp;</p>
+
+<h2>Dataset</h2>
+<ul>
+    <li>5,053 images</li>
+    <li>98 fireballs</li>
+    <li>4 cameras</li>
+    <li>Desert Fireball Network (DFN)</li>
+</ul>
+<p>&nbsp;</p>
+
+<h2>Results</h2>    
+<ul>
+    <li>
+        Predictions
+        <ul>
+            <li>Fireball (positive): 99</li>
+            <li>none (negative): 9,601</li>
+        </ul>
+    </li>
+    <li>
+        Confusion matrix
+        <ul>
+            <li>True positives: 94</li>
+            <li>False positives: 127</li>
+            <li>True negatives: 9,474</li>
+            <li>False negatives: 5</li>
+        </ul>
+    </li>
+    <li>
+        Metrics
+        <ul>
+            <li>Accuracy: 98.6&#37; (9,568 / 9,700: 132 incorrect)</li>
+            <li>Precision: 42.5&#37;</li>
+            <li>Recall: 94.9&#37;</li>
+            <li>F1 Score: 58.8&#37;</li>
+        </ul>
+    </li>
+</ul>
+
+
+{% endblock %}
