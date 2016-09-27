@@ -77,8 +77,13 @@ div.spacer{
 }
 
 img.thumbnail{
-    width: 515px;
-    height: 343px;
+    width: 368px;
+    height: 245px;
+}
+
+img.thumbnail:hover {
+    width: 736px;
+    height: 491px;
 }
 
 table[data-sortable] th.middle {
