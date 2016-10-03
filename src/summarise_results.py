@@ -37,7 +37,9 @@ def main():
 
     # Initialise variables
     label_column = 'label'
-    labels = df['label'].unique()
+    # Specify transient objects as the positive (first) class
+    labels = s.LABELS
+    # labels = df['label'].unique()
     classes_data = []
 
     # Create dataframes containing records for each class label

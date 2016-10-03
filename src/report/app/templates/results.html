@@ -14,9 +14,9 @@
 <p><a href="/">Home</a> > Results: {{view}}</p>
 
 <h2>Predictions</h2>
-<p><strong>{{ '{0:,}'.format(fireballs|length) }} fireballs</strong> retrieved</p>
+<p><strong>{{ '{0:,}'.format(transients|length) }} transients</strong> retrieved</p>
 
-{% if fireballs|length %}
+{% if transients|length %}
 
 <table class="sortable-theme-bootstrap" data-sortable>
     <thead>
@@ -29,21 +29,21 @@
         </tr>
     </thead>
     <tbody>
-        {% for fireball in fireballs %}
+        {% for transient in transients %}
             {% set row_error = '' %}
 
             {% if view != 'errors' %}
-                {% if fireball.label != fireball.prediction %}
+                {% if transient.label != transient.prediction %}
                     {% set row_error = ' class=error' %}
                 {% endif %}
             {% endif %}
 
         <tr{{row_error}}>
-            <td>{{ fireball.image }}</td>
-            <td>{{ fireball.label }}</td>
-            <td>{{ fireball.prediction }}</td>
-            <td>{{ '%0.1f' | format(fireball.confidence * 100) }}&#37;</td>
-            <td><a href="{{url_for('static', filename='img/astrosmall00_mobile/' + fireball.label + '/' + fireball.image)}}"><img class="thumbnail" src="{{url_for('static', filename='img/astrosmall00_mobile/' + fireball.label + '/' + fireball.image)}}" /></a></td>
+            <td>{{ transient.image }}</td>
+            <td>{{ transient.label }}</td>
+            <td>{{ transient.prediction }}</td>
+            <td>{{ '%0.1f' | format(transient.confidence * 100) }}&#37;</td>
+            <td><a href="{{url_for('static', filename='img/astrosmall00_mobile/' + transient.label + '/' + transient.image)}}"><img class="thumbnail" src="{{url_for('static', filename='img/astrosmall00_mobile/' + transient.label + '/' + transient.image)}}" /></a></td>
         </tr>
         {% endfor %}
     </tbody>

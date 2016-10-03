@@ -13,7 +13,7 @@ import settings as s
 # Database
 DB_NAME = 'report/app.db'
 # Database tables
-FIREBALL_TABLE = 'fireball'
+FIREBALL_TABLE = 'transient'
 
 
 def main(): 
