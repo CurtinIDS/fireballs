@@ -1,0 +1,23 @@
+
+Load results:
+  # records: 9700 
+  time taken: 0.016 seconds
+
+Summarise results:
+  Predictions:
+    meteors (positive): 99
+    none (negative): 9601
+  Confusion matrix:
+    true positives: 94
+    false positives: 127
+    true negatives: 9474
+    false negatives: 5
+  Metrics:
+    accuracy: 0.986 (9568/9700: 132 incorrect)
+    precision: 0.425
+    recall: 0.949
+    f1 score: 0.588
+  time taken: 0.005 seconds
+
+Total time: 0.021 seconds
+

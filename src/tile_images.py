@@ -2,7 +2,7 @@
 Split the dataset images into tiles for fireballs detection
 
 This script is used for when tile coordinates have been precomputed and populated 
-to data/meteors.csv. Otherwise, run the initial_tile_images.py and meteor_grids.py 
+to data/transients.csv. Otherwise, run the initial_tile_images.py and meteor_grids.py 
 scripts to extract tile coordinates for images labelled as containing meteor(s).
 
 """
@@ -29,8 +29,8 @@ def main():
     data_load_time = time.time()
     print('\nLoad data:')
 
-    # load the meteors data file
-    meteors = pd.read_csv(s.DATA_FILE, index_col=False)
+    # load the transients data file
+    transients = pd.read_csv(s.DATA_FILE, index_col=False)
 
     # Retrieve image filenames in the dataset directory
     images = [[os.path.join(dirpath, f)]
@@ -55,17 +55,17 @@ def main():
     required_images = 10
 
     # Created a background tiles dataframe containing only selected images
-    background_df = df[df['label'] == 'none']
+    background_df = df[df['label'] == s.LABEL_OTHER]
     step = len(background_df) / required_images
     indices = [i + (i * step) for i in range(required_images)]
     background_df = background_df.iloc[indices]
 
-    # Append the selected background images to the meteors dataframe
-    df = df[df['label'] == 'meteors']
+    # Append the selected background images to the transients dataframe
+    df = df[df['label'] == s.LABEL_TRANSIENT]
     df = df.append(background_df)
   
     print('  # images: %d ' % (len(images)))
-    print('  # meteors: %d ' % (len(meteors)))
+    print('  # transient objects: %d ' % (len(transients)))
     print('  time taken: %.3f seconds' % (time.time() - data_load_time))
 
 
@@ -109,11 +109,11 @@ def main():
         filename = image['image']
         filename_parts = filename.split('.')
         
-        # Check if this image contains meteors
-        image_meteors = meteors[meteors['image'] == filename]
+        # Check if this image contains transients
+        image_transients = transients[transients['image'] == filename]
 
-        # Tile coordinates are known from the meteors data file
-        meteor_tiles = ','.join(image_meteors['tiles'].values).strip().split(',')
+        # Tile coordinates are known from the transients data file
+        meteor_tiles = ','.join(image_transients['tiles'].values).strip().split(',')
         
         # Generate tiles for each row and column 
         for row in range(rows):
@@ -125,11 +125,11 @@ def main():
                 y0 = row * height
                 y1 = y0 + height
 
-                # Default to no meteors category for the tile
-                label = 'none'
+                # Default to no transients category for the tile
+                label = s.LABEL_OTHER
 
                 # Image has been labelled to contain meteor(s)
-                if len(image_meteors):
+                if len(image_transients):
 
                     # Check if this tile has been labelled as a meteor tile
                     for tile in meteor_tiles:
@@ -137,7 +137,7 @@ def main():
                             # Remove the tile once it has been found
                             meteor_tiles.remove(tile)
                             # Set the tile label as a meteor tile
-                            label = 'meteors'
+                            label = 'transients'
 
                 # Generate the tile filename 
                 tile_filename = s.CACHE_DIRECTORY + image['camera'] + '/' + label + '/'

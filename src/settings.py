@@ -10,8 +10,11 @@ RESULTS_DIRECTORY = '../results/'
 # Experiment
 CAMERAS = ['astrosmall00_mobile', 'astrosmall01', 'dfnsmall33', 'dfnsmall49']
 EXPERIMENT_NAME = CAMERAS[0]
+LABELS = ['transients', 'other']
+LABEL_TRANSIENT = LABELS[0]
+LABEL_OTHER = LABELS[1]
 # EXPERIMENT_NAME = 'all'
-EXPERIMENT_TYPE = 'retrained'
+EXPERIMENT_TYPE = 'transients'
 EXPERIMENT_PREFIX = EXPERIMENT_NAME + '_' + EXPERIMENT_TYPE
 TRAINING_STEPS = 10000
 BOTTLENECK_DIRECTORY = OUTPUT_DIRECTORY + 'bottlenecks' 
