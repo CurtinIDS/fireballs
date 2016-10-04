@@ -52,12 +52,12 @@ def main():
     # df = df[df['camera'] == s.CAMERAS[0]]
     
     # Only select a number of non meteor images for creating background tiles
-    required_images = 10
+    required_images = 50
 
     # Created a background tiles dataframe containing only selected images
     background_df = df[df['label'] == s.LABEL_OTHER]
     step = len(background_df) / required_images
-    indices = [i + (i * step) for i in range(required_images)]
+    indices = [i * step for i in range(required_images)]
     background_df = background_df.iloc[indices]
 
     # Append the selected background images to the transients dataframe

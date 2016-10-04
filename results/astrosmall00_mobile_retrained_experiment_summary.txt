@@ -1,23 +1,23 @@
 
 Load results:
-  # records: 7900 
-  time taken: 0.009 seconds
+  # records: 15300 
+  time taken: 0.016 seconds
 
 Summarise results:
   Predictions:
-    transients (positive): 258
-    other (negative): 7642
+    transients (positive): 338
+    other (negative): 14962
   Confusion matrix:
-    true positives: 232
-    false positives: 187
-    true negatives: 7455
-    false negatives: 26
+    true positives: 307
+    false positives: 435
+    true negatives: 14527
+    false negatives: 31
   Metrics:
-    accuracy: 0.973 (7687/7900: 213 incorrect)
-    precision: 0.554
-    recall: 0.899
-    f1 score: 0.685
-  time taken: 0.004 seconds
+    accuracy: 0.970 (14834/15300: 466 incorrect)
+    precision: 0.414
+    recall: 0.908
+    f1 score: 0.569
+  time taken: 0.005 seconds
 
-Total time: 0.013 seconds
+Total time: 0.022 seconds
 
