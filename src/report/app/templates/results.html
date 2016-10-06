@@ -7,6 +7,7 @@
 
 {% block scripts %}
   <script src="{{url_for('static', filename='js/lib/sortable.js')}}"></script>
+  <script src="{{url_for('static', filename='js/relabel.js')}}"></script>
 {% endblock %}
 
 {% block content %}
@@ -43,11 +44,13 @@
             <td>{{ transient.label }}</td>
             <td>{{ transient.prediction }}</td>
             <td>{{ '%0.1f' | format(transient.confidence * 100) }}&#37;</td>
-            <td><a href="{{url_for('static', filename='img/astrosmall00_mobile/' + transient.label + '/' + transient.image)}}"><img class="thumbnail" src="{{url_for('static', filename='img/astrosmall00_mobile/' + transient.label + '/' + transient.image)}}" /></a></td>
+            <td><img class="thumbnail" src="{{url_for('static', filename='img/astrosmall00_mobile/' + transient.label + '/' + transient.image)}}" onclick="javascript:label_image('{{transient.image}}', this)" /></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<div id="labels"></div>
 
 {% endif %}
 

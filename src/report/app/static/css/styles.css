@@ -79,11 +79,13 @@ div.spacer{
 img.thumbnail{
     width: 368px;
     height: 245px;
+    cursor: pointer;
 }
 
 img.thumbnail:hover {
     width: 736px;
     height: 491px;
+    cursor: pointer;
 }
 
 table[data-sortable] th.middle {
@@ -96,6 +98,14 @@ table[data-sortable] tr.error {
 
 table[data-sortable].sortable-theme-bootstrap tbody > tr:nth-child(odd).error > td {
   background-color: #eab5b5;
+}
+
+table[data-sortable] tr.label {
+    background-color: #228B22;
+}
+
+table[data-sortable].sortable-theme-bootstrap tbody > tr:nth-child(odd).label > td {
+  background-color: #229B22;
 }
 
 span.large {
