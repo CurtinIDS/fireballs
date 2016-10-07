@@ -13,6 +13,8 @@ import os
 import fnmatch
 import pandas as pd
 import settings as s
+import multiprocessing
+import joblib
 
 from skimage import io
 
@@ -97,55 +99,83 @@ def main():
     image = io.imread(df.iloc[0]['file'])
     height = int(image.shape[0] / rows)
     width = int(image.shape[1] / cols)
+
+    df = df.head(100)
     
-    # TODO: parallelise tiling of images
+    # 
+    # Parallelised implementation
+    # 
+    # Benchmarks
+    # Parallel = 8 cores threading
+    # - 10 images
+    #   - Serial: 72 secs (1m 12s)
+    #   - Parallel: 28 secs
+    # - 50 images
+    #   - Serial:  359 secs (5m 59s)
+    #   - Parallel: 124 secs (2m 4s)
+    # - 100 images
+    #   - Serial: 728 secs (12m 8s)
+    #   - Parallel: 240 secs (4m 0s)
+    # parallel_time = time.time() 
+
     # Generate image tiles
-    for index, image in df.iterrows():
+    generate_tiles(df, rows, cols, height, width, transients)
 
-        # Load the image
-        image_data = io.imread(image['file'])
+    # print('  parallel: %.3f seconds' % (time.time() - parallel_time))
+
+    # 
+    # Serial implementation
+    # 
+    # serial_time = time.time()
+
+    # for index, image in df.iterrows():
+
+    #     # Load the image
+    #     image_data = io.imread(image['file'])
         
-        # Filename info used saving tile images
-        filename = image['image']
-        filename_parts = filename.split('.')
+    #     # Filename info used saving tile images
+    #     filename = image['image']
+    #     filename_parts = filename.split('.')
         
-        # Check if this image contains transients
-        image_transients = transients[transients['image'] == filename]
+    #     # Check if this image contains transients
+    #     image_transients = transients[transients['image'] == filename]
 
-        # Tile coordinates are known from the transients data file
-        meteor_tiles = ','.join(image_transients['tiles'].values).strip().split(',')
+    #     # Tile coordinates are known from the transients data file
+    #     meteor_tiles = ','.join(image_transients['tiles'].values).strip().split(',')
         
-        # Generate tiles for each row and column 
-        for row in range(rows):
-            for col in range(cols):
+    #     # Generate tiles for each row and column 
+    #     for row in range(rows):
+    #         for col in range(cols):
 
-                # Pixel coordinates for the tile
-                x0 = col * width
-                x1 = x0 + width
-                y0 = row * height
-                y1 = y0 + height
+    #             # Pixel coordinates for the tile
+    #             x0 = col * width
+    #             x1 = x0 + width
+    #             y0 = row * height
+    #             y1 = y0 + height
 
-                # Default to no transients category for the tile
-                label = s.LABEL_OTHER
+    #             # Default to no transients category for the tile
+    #             label = s.LABEL_OTHER
 
-                # Image has been labelled to contain meteor(s)
-                if len(image_transients):
+    #             # Image has been labelled to contain meteor(s)
+    #             if len(image_transients):
 
-                    # Check if this tile has been labelled as a meteor tile
-                    for tile in meteor_tiles:
-                        if row == int(tile[0]) and col == int(tile[1]):
-                            # Remove the tile once it has been found
-                            meteor_tiles.remove(tile)
-                            # Set the tile label as a meteor tile
-                            label = 'transients'
+    #                 # Check if this tile has been labelled as a meteor tile
+    #                 for tile in meteor_tiles:
+    #                     if row == int(tile[0]) and col == int(tile[1]):
+    #                         # Remove the tile once it has been found
+    #                         meteor_tiles.remove(tile)
+    #                         # Set the tile label as a meteor tile
+    #                         label = 'transients'
 
-                # Generate the tile filename 
-                tile_filename = s.CACHE_DIRECTORY + image['camera'] + '/' + label + '/'
-                tile_filename += filename_parts[0] + '_' + str(row) + str(col)
-                tile_filename += '.' + filename_parts[1] + '.' + filename_parts[2]
+    #             # Generate the tile filename 
+    #             tile_filename = s.CACHE_DIRECTORY + image['camera'] + '/' + label + '/'
+    #             tile_filename += filename_parts[0] + '_' + str(row) + str(col)
+    #             tile_filename += '.' + filename_parts[1] + '.' + filename_parts[2]
 
-                # Save the tile image to the correct labelled folder
-                io.imsave(tile_filename, image_data[y0:y1, x0:x1, :])
+    #             # Save the tile image to the correct labelled folder
+    #             io.imsave(tile_filename, image_data[y0:y1, x0:x1, :])
+
+    # print('  serial: %.3f seconds' % (time.time() - serial_time))
 
     print('  tiles created: %d images' % (len(df)))
     print('  time taken: %.3f seconds' % (time.time() - image_tiling_time))
@@ -156,6 +186,67 @@ def main():
     #
 
     print('\nTotal time: %.3f seconds\n' % (time.time() - start_time))
+
+
+def generate_tiles(images, rows, cols, height, width, transients):
+    ''' Outer loop for tiling images '''
+    # Use the maximum number of cores available
+    num_cores = multiprocessing.cpu_count()
+    par = joblib.Parallel(n_jobs=num_cores, backend="threading")
+
+    # function to be parallelised
+    par_func = joblib.delayed(_generate_tiles_inner)
+
+    # run the parallelised function
+    par(par_func(image, rows, cols, height, width, transients) for index, image in images.iterrows())
+    
+
+def _generate_tiles_inner(image, rows, cols, height, width, transients):
+    ''' Inner loop for tiling an image '''
+    # Load the image
+    image_data = io.imread(image['file'])
+    
+    # Extract filename info used for saving tile images
+    filename = image['image']
+    filename_parts = filename.split('.')
+    
+    # Check if this image contains transients
+    image_transients = transients[transients['image'] == filename]
+
+    # Tile coordinates are known from the transients data file
+    meteor_tiles = ','.join(image_transients['tiles'].values).strip().split(',')
+    
+    # Generate tiles for each row and column 
+    for row in range(rows):
+        for col in range(cols):
+
+            # Pixel coordinates for the tile
+            x0 = col * width
+            x1 = x0 + width
+            y0 = row * height
+            y1 = y0 + height
+
+            # Default to no transients category for the tile
+            label = s.LABEL_OTHER
+
+            # Image has been labelled to contain meteor(s)
+            if len(image_transients):
+
+                # Check if this tile has been labelled as a meteor tile
+                for tile in meteor_tiles:
+                    if row == int(tile[0]) and col == int(tile[1]):
+                        # Remove the tile once it has been found
+                        meteor_tiles.remove(tile)
+                        # Set the tile label as a meteor tile
+                        label = 'transients'
+
+            # Generate the tile filename 
+            tile_filename = s.CACHE_DIRECTORY + image['camera'] + '/' + label + '/'
+            tile_filename += filename_parts[0] + '_' + str(row) + str(col)
+            tile_filename += '.' + filename_parts[1] + '.' + filename_parts[2]
+
+            # Save the tile image to the correct labelled folder
+            io.imsave(tile_filename, image_data[y0:y1, x0:x1, :])
 
 
 if __name__ == '__main__':
