@@ -99,8 +99,6 @@ def main():
     image = io.imread(df.iloc[0]['file'])
     height = int(image.shape[0] / rows)
     width = int(image.shape[1] / cols)
-
-    df = df.head(100)
     
     # 
     # Parallelised implementation
