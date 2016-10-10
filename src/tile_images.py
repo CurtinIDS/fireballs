@@ -52,19 +52,20 @@ def main():
 
     # Filter tiling to a specific camera
     # df = df[df['camera'] == s.CAMERAS[0]]
-    
+   
+    # NOTE: Commented out after we have a large enough training dataset
     # Only select a number of non meteor images for creating background tiles
-    required_images = 50
+    # required_images = 50
 
-    # Created a background tiles dataframe containing only selected images
-    background_df = df[df['label'] == s.LABEL_OTHER]
-    step = len(background_df) / required_images
-    indices = [i * step for i in range(required_images)]
-    background_df = background_df.iloc[indices]
+    # # Created a background tiles dataframe containing only selected images
+    # background_df = df[df['label'] == s.LABEL_OTHER]
+    # step = len(background_df) / required_images
+    # indices = [i * step for i in range(required_images)]
+    # background_df = background_df.iloc[indices]
 
-    # Append the selected background images to the transients dataframe
-    df = df[df['label'] == s.LABEL_TRANSIENT]
-    df = df.append(background_df)
+    # # Append the selected background images to the transients dataframe
+    # df = df[df['label'] == s.LABEL_TRANSIENT]
+    # df = df.append(background_df)
   
     print('  # images: %d ' % (len(images)))
     print('  # transient objects: %d ' % (len(transients)))
@@ -81,6 +82,9 @@ def main():
     # Get folder names
     cameras = df['camera'].unique()
     labels = df['label'].unique()
+
+    # Restrict the dataframe to only evaluate images containing transisent objects
+    df = df[df['label'] == s.LABEL_TRANSIENT]
 
     # Create the folders in the cache directory if they don't already exist
     for camera in cameras:
