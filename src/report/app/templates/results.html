@@ -33,7 +33,7 @@
         {% for transient in transients %}
             {% set row_error = '' %}
 
-            {% if view != 'errors' %}
+            {% if view != 'errors' and view != 'transients' %}
                 {% if transient.label != transient.prediction %}
                     {% set row_error = ' class=error' %}
                 {% endif %}

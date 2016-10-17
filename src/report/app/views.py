@@ -19,6 +19,8 @@ def results(view):
     if view == 'errors':
         transients = Transient.query.filter(Transient.label != Transient.prediction).all()
     # Show all classification results
+    elif view == 'transients':
+        transients = Transient.query.filter(Transient.prediction == 'transients').order_by(Transient.confidence.desc()).all()
     else:
         transients = Transient.query.all()
 
