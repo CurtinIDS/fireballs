@@ -56,7 +56,8 @@ def tile(filename,w,h):
     im=misc.imread(filename)
     X=im.shape[0]
     Y=im.shape[1]
-
+    if ((X>1228) or (Y>1840)):   
+        im=im.resize(1228,1840)
     while (j<int(Y/h)):  #Divide vertically into Y/h tiles
         j+=1
         if (j==int(Y/h)):
@@ -74,7 +75,7 @@ def tile(filename,w,h):
     return image_tiles
 
 
-def predict(directory,model,tolerance):
+def predict(directory,model,tolerance): #Returns 1/0 based on if transient object is preset. If 1, out_filename_tilename would be created
 	outf={}
 	for files in os.listdir(directory):
 		SET=tile(directory+'/'+files,200,200)
