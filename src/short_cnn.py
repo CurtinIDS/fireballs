@@ -75,10 +75,12 @@ def tile(filename, w, h):
     w_y = 0
     image_tiles = []
     im = misc.imread(filename)
-    X = im.shape[0]
-    Y = im.shape[1]
-    if ((X > 1228) or (Y > 1840)):   
-        im = im.resize(1228, 1840)
+
+    X=im.size[0]
+    Y=im.size[1]
+    if ((X>1840) or (Y>1228)):
+        im=im.thumbnail(1840,1228)
+    
     # Divide vertically into Y/h tiles
     while (j < int(Y / h)):  
         j += 1
