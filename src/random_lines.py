@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#Create new directories
 from random import random
 from PIL import Image
 
@@ -22,6 +23,14 @@ def dist(A): #Computes distance between two points in px
 
 
 count=0
+def create_dir(name):
+    if not os.path.exists(name):
+        os.makedirs(name)
+
+
+create_dir(dest_dir)
+create_dir(out_dir)
+
 for each in os.listdir(src_dir):
     copyfile(src_dir+'/'+each,dest_dir+'/'+str(count)+'.jpg')
     count+=1
@@ -35,10 +44,10 @@ for i in range(sample_size):
         myrand=int(random()*image_len) #Open files with random background and w/o meteorites
     
     im=Image.open(dest_dir+'/'+str(myrand)+'.jpg')
-    X=im.shape[0]
-    Y=im.shape[1]
-    if ((X>1228) or (Y>1840)):
-        im=im.resize(1228,1840)
+    X=im.size[0]
+    Y=im.size[1]
+    if ((X>1840) or (Y>1228)):
+        im=im.thumbnail(1840,1228)
     width,height=im.size
     marker_x=width*2
     marker_y=height*2
