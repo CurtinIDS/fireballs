@@ -39,7 +39,7 @@ def main():
 
     # start=timeit()
 
-    predict('xiang', model, 0.9)
+    predict('gray', model, 0.9)
     # print (timeit()-start)
 
 
@@ -76,10 +76,10 @@ def tile(filename, w, h):
     image_tiles = []
     im = misc.imread(filename)
 
-    X=im.size[0]
-    Y=im.size[1]
-    if ((X>1840) or (Y>1228)):
-        im=im.thumbnail(1840,1228)
+    X=im.shape[0]
+    Y=im.shape[1]
+    if ((Y>1228) or (X>1840)):
+        im=misc.imresize(im,[1228,1840])
     
     # Divide vertically into Y/h tiles
     while (j < int(Y / h)):  
@@ -106,7 +106,7 @@ def predict(directory, model, tolerance):
     for files in os.listdir(directory):
         SET = tile(directory + '/' + files, 200, 200)
         flag = 0
-        for i in range(len(SET)):
+        for i in range(len(SET)):   
             result = model.predict([np.reshape(SET[i], [200, 200, 1])])[0][1]
             if (result > tolerance):
                 misc.imsave(directory + '/out_' + files + '_' + str(i) + '.jpg', SET[i])
