@@ -10,8 +10,12 @@ import os
 
 filter_w=200 #tile width
 filter_h=200 #tile height
-src_dir='NONE'
-dest_dir='new'
+src_dir='NONE' #Directory that contains orinigal images WITHOUT transients
+dest_dir='new' #Temporary directory
+out_dir='post'
+sample_size=1000 #How many samples to generate?
+bias=0.5 #Transient/no_tranient ratio
+
 
 def dist(A): #Computes distance between two points in px
     return(((A[0][0]-A[0][2])**2+(A[0][1]-A[0][3])**2)**0.5)
@@ -25,12 +29,16 @@ for each in os.listdir(src_dir):
 
 image_len=len(os.listdir(src_dir))
 
-for i in range(1000):
+for i in range(sample_size):
     myrand=0
     while myrand==0:
         myrand=int(random()*image_len) #Open files with random background and w/o meteorites
     
     im=Image.open(dest_dir+'/'+str(myrand)+'.jpg')
+    X=im.shape[0]
+    Y=im.shape[1]
+    if ((X>1228) or (Y>1840)):
+        im=im.resize(1228,1840)
     width,height=im.size
     marker_x=width*2
     marker_y=height*2
@@ -42,7 +50,7 @@ for i in range(1000):
     draw = ImageDraw.Draw(im)
     A=[(random()*im.size[0], random()*im.size[1], random()*im.size[0], random()*im.size[1])]
     myrand=str(myrand)
-    if (random()>0.5): #Statistically, only half the samples would have meteorites
+    if (random()>bias):
         if ((dist(A)>30) and (dist(A)<300)): #The lines shouldn't be too short or too long
             color_rnd=0
             while (color_rnd<0.3): 
@@ -54,5 +62,5 @@ for i in range(1000):
             myrand=myrand+'_y' #Add _y to files that contain  meteors
             del draw
 
-    im.save('/home/shiv/cira/post/'+str(i)+'_'+str(myrand)+'.jpg')
+    im.save(out_dir+'/'+str(i)+'_'+str(myrand)+'.jpg')
     
