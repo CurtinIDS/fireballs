@@ -6,17 +6,23 @@
 # -change predict function towards the end to include test director
 #
 #
-import tflearn
+
 import os
-from timeit import timeit
+import numpy as np
 import tensorflow as tf
+import tflearn
+
+from random import random
+from scipy import misc
+
 from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.estimator import regression
-import numpy as np
 from tflearn.layers.normalization import local_response_normalization
-from random import random
-from scipy import misc
+
+MODEL_FILE = '../models/synthetic'
+# DATA_FOLDER = '../cache/xiang'
+DATA_FOLDER = '../cache/new'
 
 
 def main(): 
@@ -24,23 +30,19 @@ def main():
     # C,D=loadimage('temp')
     # C,D=loadimage('validation')
 
-
     network = input_data(shape=[None, 200, 200, 1], name='input')  # 200x200 tile
     network = cnn(network, 3)
     network = fully_connected(network, 10, activation='tanh')
     network = fully_connected(network, 2, activation='softmax')
     network = regression(network, optimizer='sgd', learning_rate=0.01, loss='categorical_crossentropy', name='target')
     model = tflearn.DNN(network, checkpoint_path='.ckpt')
-    if os.path.exists('checkpoint'):  # if checkpoint file found, then load the model
-        model.load("trial")
 
+    if os.path.exists('checkpoint'):  # if checkpoint file found, then load the model
+        model.load(MODEL_FILE)
 
     # model.fit({'input':A},{'target': B},validation_set=({'input':C},{'target':D}),n_epoch=150,batch_size=30,snapshot_epoch=True,show_metric=True)
 
-    # start=timeit()
-
-    predict('gray', model, 0.9)
-    # print (timeit()-start)
+    predict(DATA_FOLDER, model, 0.9)
 
 
 def cnn(network, count):
@@ -76,10 +78,10 @@ def tile(filename, w, h):
     image_tiles = []
     im = misc.imread(filename)
 
-    X=im.shape[0]
-    Y=im.shape[1]
-    if ((Y>1228) or (X>1840)):
-        im=misc.imresize(im,[1228,1840])
+    X = im.shape[0]
+    Y = im.shape[1]
+    if ((Y > 1228) or (X > 1840)):
+        im = misc.imresize(im, [1228, 1840])
     
     # Divide vertically into Y/h tiles
     while (j < int(Y / h)):  
@@ -100,13 +102,13 @@ def tile(filename, w, h):
     return image_tiles
 
 
-# Returns 1/0 based on if transient object is preset. If 1, out_filename_tilename would be created
 def predict(directory, model, tolerance):
+    ''' Returns 1/0 based on if transient object is preset. If 1, out_filename_tilename would be created '''
     outf = {}
     for files in os.listdir(directory):
         SET = tile(directory + '/' + files, 200, 200)
         flag = 0
-        for i in range(len(SET)):   
+        for i in range(len(SET)): 
             result = model.predict([np.reshape(SET[i], [200, 200, 1])])[0][1]
             if (result > tolerance):
                 misc.imsave(directory + '/out_' + files + '_' + str(i) + '.jpg', SET[i])
