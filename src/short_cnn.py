@@ -22,27 +22,39 @@ from tflearn.layers.normalization import local_response_normalization
 
 MODEL_FILE = '../models/synthetic'
 # DATA_FOLDER = '../cache/xiang'
+TRAINING_DATA_FOLDER = '../cache/post'
+VALIDATION_DATA_FOLDER = '../cache/validation'
 DATA_FOLDER = '../cache/new'
 
 
-def main(): 
-    # A,B=loadimage('training')
-    # C,D=loadimage('temp')
-    # C,D=loadimage('validation')
 
-    network = input_data(shape=[None, 200, 200, 1], name='input')  # 200x200 tile
+def main(): 
+    A, B = loadimage(TRAINING_DATA_FOLDER)
+    C, D = loadimage(VALIDATION_DATA_FOLDER)
+
+    # Network architecture
+
+    # Input data - 200 x 200 grayscale tile
+    network = input_data(shape=[None, 200, 200, 1], name='input')
+
+    # 3 convolution and max pooling layers
     network = cnn(network, 3)
+
     network = fully_connected(network, 10, activation='tanh')
     network = fully_connected(network, 2, activation='softmax')
     network = regression(network, optimizer='sgd', learning_rate=0.01, loss='categorical_crossentropy', name='target')
+
     model = tflearn.DNN(network, checkpoint_path='.ckpt')
 
     if os.path.exists('checkpoint'):  # if checkpoint file found, then load the model
         model.load(MODEL_FILE)
 
-    # model.fit({'input':A},{'target': B},validation_set=({'input':C},{'target':D}),n_epoch=150,batch_size=30,snapshot_epoch=True,show_metric=True)
+    model.fit(
+        {'input':A},
+        {'target': B},
+        validation_set=({'input':C},{'target':D}),n_epoch=150,batch_size=30,snapshot_epoch=True,show_metric=True)
 
-    predict(DATA_FOLDER, model, 0.9)
+    # predict(DATA_FOLDER, model, 0.9)
 
 
 def cnn(network, count):
