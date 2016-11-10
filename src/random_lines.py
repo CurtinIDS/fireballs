@@ -40,12 +40,8 @@ def main():
 
     # Create folders for generating storing generated synthetic images 
     create_folder(TEMP_FOLDER)
-    create_folder(TRAINING_FOLDER)
-    create_folder(TRAINING_FOLDER + '/0')
-    create_folder(TRAINING_FOLDER + '/1')
-    create_folder(VALIDATION_FOLDER)
-    create_folder(VALIDATION_FOLDER + '/0')
-    create_folder(VALIDATION_FOLDER + '/1')
+    create_folder(TRAINING_FOLDER, labels=True)
+    create_folder(VALIDATION_FOLDER, labels=True)
 
     # Copy source images to a temporary folder
     count = 0
@@ -151,15 +147,13 @@ def generate_images(folder, samples, random_seed):
         else:
             im.save(folder + '/0/' + str(i) + '_' + str(myrand) + '.jpg')
 
-    
-
 
 def dist(A): 
     ''' Computes distance between two points in pixels '''
     return(((A[0][0] - A[0][2])**2 + (A[0][1] - A[0][3])**2)**0.5)
 
 
-def create_folder(name):
+def create_folder(name, labels=False):
     ''' Create the folder for generating synthetic images '''
     if os.path.exists(name):
         # Remove the existing folder
@@ -167,6 +161,10 @@ def create_folder(name):
     
     # Create the folder
     os.makedirs(name)
+    # Create label folders if required
+    if labels:
+        os.makedirs(name + '/0')
+        os.makedirs(name + '/1')
     
 
 if __name__ == '__main__':
