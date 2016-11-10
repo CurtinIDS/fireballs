@@ -1,6 +1,8 @@
-#!/usr/bin/env python
-# Create new directories
+"""
+Create a dataset that consists of transient objects (streaks) synthetically generated
+and placed on real background image tiles of the night sky
 
+"""
 import math
 import os
 import shutil
