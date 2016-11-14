@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Create a dataset that consists of transient objects (streaks) synthetically generated
 and placed on real background image tiles of the night sky
@@ -8,14 +9,14 @@ import os
 import shutil
 import settings as s
 import time
-from random import random, seed
+from random import random, seed, randrange
 from shutil import copyfile
 from PIL import Image, ImageDraw
 
 TILE_WIDTH = 200
 TILE_HEIGHT = 200
 # Number of samples to generate
-TRAINING_SAMPLES = 1000 
+TRAINING_SAMPLES = 10000
 VALIDATION_SAMPLES = int(TRAINING_SAMPLES * 0.1)
 # Transient / no transient ratio
 BIAS = 0.5
@@ -88,22 +89,21 @@ def main():
 def generate_images(folder, samples, random_seed):
     ''' Generate synthethic images '''
 
-    # Seed the random number generator
-    seed(random_seed)
-
+    # Seed the random number generator   
+    # seed(random_seed)
     image_len = len(os.listdir(SOURCE_FOLDER))
 
     for i in range(samples):
-        myrand = 0
 
-        while myrand == 0:
-            # Open files with random background and w/o meteorites
-            myrand = int(random() * image_len)
-        
+        # Select a random background image without meteorites
+        myrand = randrange(1, image_len)
+
+        # 0.008 - 0.013 seconds to load file
         im = Image.open(TEMP_FOLDER + '/' + str(myrand) + '.jpg')
         X = im.size[0]
         Y = im.size[1]
-
+        
+        # Resize the image if required 
         if ((X > 1840) or (Y > 1228)):
             im = im.thumbnail(1840, 1228)
 
@@ -111,12 +111,13 @@ def generate_images(folder, samples, random_seed):
         marker_x = width * 2
         marker_y = height * 2
 
+        # Randomly select the area within the image that will be used as the background tile
         while ((marker_x + TILE_WIDTH) > width):
             marker_x = int(random() * width)
-
             while ((marker_y + TILE_HEIGHT) > height):
                 marker_y = int(random() * height)
-
+        
+        # 0.034 - 0.039 seconds (slower operation on Mac OSX than Linux)
         im = im.crop((marker_x, marker_y, marker_x + TILE_WIDTH, marker_y + TILE_HEIGHT))
         draw = ImageDraw.Draw(im)
         A = [(random() * im.size[0], random() * im.size[1], random() * im.size[0], random() * im.size[1])]

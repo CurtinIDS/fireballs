@@ -19,6 +19,8 @@ from tflearn.layers.estimator import regression
 from tflearn.layers.normalization import local_response_normalization
 from tflearn.data_preprocessing import ImagePreprocessing
 
+LOAD_EXISTING_MODEL = False
+EXISTING_MODEL = '../models/synthetic'
 MODEL = 'synthetic'
 CHECKPOINT_FOLDER = s.OUTPUT_DIRECTORY + MODEL
 TRAINING_FOLDER = s.SYNTHETIC_DIRECTORY + 'training'
@@ -36,9 +38,10 @@ def main():
     data_load_time = time.time()
     print('\nLoad and prepare dataset:')
 
+    # Load the training and validation datasets
     X, y = load_images(TRAINING_FOLDER)
     X_val, y_val = load_images(VALIDATION_FOLDER)
-
+    
     # Normalise the image data
     image_prep = ImagePreprocessing()
     image_prep.add_featurewise_zero_center()
@@ -58,11 +61,11 @@ def main():
     # Convolutional network
     network = input_data(shape=[None, 200, 200, 1], name='input', data_preprocessing=image_prep)
     # network = input_data(shape=[None, 200, 200, 1], name='input')
-    network = conv_2d(network, 12, 3, activation='relu')
+    network = conv_2d(network, 12, 3, activation='relu', regularizer='L2')
     network = max_pool_2d(network, 2)
-    network = conv_2d(network, 24, 3, activation='relu')
+    network = conv_2d(network, 24, 3, activation='relu', regularizer='L2')
     network = max_pool_2d(network, 2)
-    network = conv_2d(network, 36, 3, activation='relu')
+    network = conv_2d(network, 36, 3, activation='relu', regularizer='L2')
     network = max_pool_2d(network, 2)
     network = fully_connected(network, 10, activation='tanh')
     network = fully_connected(network, 2, activation='softmax')
@@ -81,11 +84,11 @@ def main():
         os.makedirs(CHECKPOINT_FOLDER)
 
     # Specify the model output folder
-    model = tflearn.DNN(network, checkpoint_path=CHECKPOINT_FOLDER + '/')
+    model = tflearn.DNN(network, checkpoint_path=CHECKPOINT_FOLDER + '/', tensorboard_dir='../output/logs/')
 
-    # Load a previous model checkpoint 
-    # if os.path.exists(CHECKPOINT_FOLDER + '/checkpoint'):
-    #     model.load(MODEL_FILE)
+    # Load a previous model 
+    if LOAD_EXISTING_MODEL:
+        model.load(EXISTING_MODEL)
 
     # Train the model
     model.fit({'input': X}, {'target': y}, validation_set=({'input': X_val}, {'target': y_val}), n_epoch=150, batch_size=30, snapshot_epoch=True, show_metric=True)
@@ -97,22 +100,9 @@ def main():
     #
     print('\nTotal time: %.3f seconds\n' % (time.time() - start_time))
 
-    #
-    # Instructions
-    # -touch a file "checkpoint"
-    # -resize to 25% of the original image
-    # -change predict function towards the end to include test director
-    #
-    # MODEL_FILE = '../models/synthetic'
-    # TEST_FOLDER = '../cache/new'
-    # if checkpoint file found, then load the model
-    # model = tflearn.DNN(network, checkpoint_path='.ckpt')
-    # if os.path.exists('checkpoint'):
-    #     model.load(MODEL_FILE)
-    # predict(TEST_FOLDER, model, 0.9)
-
 
 def load_images(path):
+    ''' Load dataset images and their labels '''
     images = []
     labels = []
 
@@ -122,6 +112,8 @@ def load_images(path):
             # e.g. /0/ = [1. 0] and /1/ = [0  1.]
             c = np.zeros(2)
             c[int(subdir)] = 1
+
+            # print (file, c)
             labels.append(c)
 
             image = misc.imread(path + '/' + subdir + '/' + file)
@@ -130,63 +122,14 @@ def load_images(path):
             image = image.astype('float32')
             images.append(image)
 
+    test = np.asarray(labels)
+    print (np.sum(test[:, 0] == 1))
+    print (np.sum(test[:, 1] == 1))
+    
     return images, labels
 
 
-def tile(filename, w, h):
-    i = 0
-    j = 0
-    w_x = 0
-    w_y = 0
-    image_tiles = []
-    im = misc.imread(filename)
 
-    X = im.shape[0]
-    Y = im.shape[1]
-    if ((Y > 1228) or (X > 1840)):
-        im = misc.imresize(im, [1228, 1840])
-    
-    # Divide vertically into Y/h tiles
-    while (j < int(Y / h)):  
-        j += 1
-
-        if (j == int(Y / h)):
-            w_y = (Y - h)
-        i = 0
-        w_x = 0
-
-        # Divide horizontally into X/w tiles
-        while (i < int(X / w)): 
-            i += 1
-
-            if (i == int(X / w)):
-                w_x = (X - w)
-            image_tiles.append(im[w_x:w_x + w, w_y:w_y + h])
-
-            w_x += w
-        w_y += h
-    return image_tiles
-
-
-def predict(directory, model, tolerance):
-    ''' Returns 1 or 0 based on if transient object is present. If 1, out_filename_tilename is created '''
-    outf = {}
-
-    for files in os.listdir(directory):
-        SET = tile(directory + '/' + files, 200, 200)
-        flag = 0
-
-        for i in range(len(SET)): 
-            result = model.predict([np.reshape(SET[i], [200, 200, 1])])[0][1]
-
-            if (result > tolerance):
-                misc.imsave(directory + '/out_' + files + '_' + str(i) + '.jpg', SET[i])
-                flag = 1
-
-        if flag == 1:
-            print (files + '--->1')
-        else:
-            print (files + '--->0')
 
 
 if __name__ == '__main__':
