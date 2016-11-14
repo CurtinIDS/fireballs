@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Create a dataset that consists of transient objects (streaks) synthetically generated
 and placed on real background image tiles of the night sky
@@ -16,13 +15,17 @@ from PIL import Image, ImageDraw
 TILE_WIDTH = 200
 TILE_HEIGHT = 200
 # Number of samples to generate
-TRAINING_SAMPLES = 10000
+TRAINING_SAMPLES = 1000
 VALIDATION_SAMPLES = int(TRAINING_SAMPLES * 0.1)
 # Transient / no transient ratio
 BIAS = 0.5
+# Brightness of the transient objects (streaks) drawn
+BRIGHTNESS_VALUES = [250, 200, 150]
+STREAK_BRIGHTNESS_INDEX = 0
+STREAK_BRIGHTNESS = BRIGHTNESS_VALUES[STREAK_BRIGHTNESS_INDEX]
 # Seed numbers used for random number generator to repliciating experimental results
-TRAINING_SEED = 5656
-VALIDATION_SEED = 2961
+TRAINING_SEED = STREAK_BRIGHTNESS_INDEX + 5656
+VALIDATION_SEED = STREAK_BRIGHTNESS_INDEX + 2961
 # original images with NO transient objects
 SOURCE_FOLDER = s.SYNTHETIC_DIRECTORY + 'source'
 TEMP_FOLDER = s.SYNTHETIC_DIRECTORY + 'temp' 
@@ -90,7 +93,7 @@ def generate_images(folder, samples, random_seed):
     ''' Generate synthethic images '''
 
     # Seed the random number generator   
-    # seed(random_seed)
+    seed(random_seed)
     image_len = len(os.listdir(SOURCE_FOLDER))
 
     for i in range(samples):
@@ -116,7 +119,7 @@ def generate_images(folder, samples, random_seed):
             marker_x = int(random() * width)
             while ((marker_y + TILE_HEIGHT) > height):
                 marker_y = int(random() * height)
-        
+
         # 0.034 - 0.039 seconds (slower operation on Mac OSX than Linux)
         im = im.crop((marker_x, marker_y, marker_x + TILE_WIDTH, marker_y + TILE_HEIGHT))
         draw = ImageDraw.Draw(im)
@@ -139,8 +142,8 @@ def generate_images(folder, samples, random_seed):
                     # Width should be less than 2 px
                     width_rand = int(random() * 2) 
 
-                draw.line([A[0][0], A[0][1], A[0][2], A[0][3]], fill=int(color_rnd * 100), width=width_rand)
-                # Add _y to files that contain meteors
+                draw.line([A[0][0], A[0][1], A[0][2], A[0][3]], fill=int(color_rnd * STREAK_BRIGHTNESS), width=width_rand)
+                # Add _y to files that contain transient objects
                 myrand = myrand + '_y' 
                 has_meteor = True
                 del draw
