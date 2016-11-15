@@ -133,7 +133,7 @@ def generate_images(folder, samples, random_seed):
             if ((dist(A) > 30) and (dist(A) < 300)): 
 
                 color_rnd = 0
-                while (color_rnd < 0.3): 
+                while (color_rnd < 0.35): 
                     # Brightness should be over certain threshold, lower the brightness -> harder to train, more resilient
                     color_rnd = random() 
 

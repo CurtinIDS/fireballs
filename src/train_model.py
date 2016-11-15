@@ -13,7 +13,7 @@ import settings as s
 from random import random
 from scipy import misc
 
-from tflearn.layers.core import input_data, dropout, fully_connected
+from tflearn.layers.core import input_data, fully_connected
 from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.estimator import regression
 from tflearn.layers.normalization import local_response_normalization
@@ -121,15 +121,8 @@ def load_images(path):
             # Convert the numpy array to float32 to work with image preparation functions
             image = image.astype('float32')
             images.append(image)
-
-    test = np.asarray(labels)
-    print (np.sum(test[:, 0] == 1))
-    print (np.sum(test[:, 1] == 1))
     
     return images, labels
-
-
-
 
 
 if __name__ == '__main__':
