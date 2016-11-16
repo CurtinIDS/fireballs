@@ -6,7 +6,7 @@ neural network model
 from __future__ import print_function
 
 import os
-import fnmatch
+import glob
 import time
 import tflearn
 import numpy as np
@@ -20,17 +20,13 @@ from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.estimator import regression
 from tflearn.data_preprocessing import ImagePreprocessing
 
-# Instructions
-# -resize to 25% of the original image
-# -change predict function towards the end to include test director
-#
-MODEL_FILE = s.MODELS_DIRECTORY + 'synthetic'
+EXPERIMENT_NAME = 'exp7'
+MODEL_FILE = s.MODELS_DIRECTORY + EXPERIMENT_NAME
 IMAGES_FOLDER = s.CACHE_DIRECTORY + 'astrosmall00_mobile'
 OUTPUT_FOLDER = s.OUTPUT_DIRECTORY + 'test'
-
-# if checkpoint file found, then load the model
-# model = tflearn.DNN(network, checkpoint_path='.ckpt')
-# predict(TEST_FOLDER, model, 0.9)
+LABELS_FILE = s.CACHE_DIRECTORY + 'astrosmall00_mobile_labels.txt'
+CONFIDENCE_THRESHOLD = 0.9
+RESULTS_FILE = s.RESULTS_DIRECTORY + EXPERIMENT_NAME + '.csv'
 
 
 def main():
@@ -45,19 +41,17 @@ def main():
 
     # Load annotations
     # Retrieve file locations of images in the dataset
-    # images = [os.path.join(dirpath, f) 
-    #           for dirpath, dirnames, files in os.walk(s.IMAGES_DIRECTORY)
-    #           for f in fnmatch.filter(files, '*.jpg')]
+    images = glob.glob(IMAGES_FOLDER + '/*.jpg')
 
     # Retrieve the class labels
-    # labels = [line.rstrip() for line in tf.gfile.GFile(s.IMAGE_LABELS_FILE)]
+    labels = [line.rstrip() for line in open(LABELS_FILE)]
 
     # List to store classification predictions and scores for images
-    # output_df = pd.DataFrame()
+    output_df = pd.DataFrame()
 
-    # print('  # images: %d ' % (len(images)))
-    # print('  # labels: %d ' % (len(labels)))
-    # print('  time taken: %.3f seconds' % (time.time() - data_load_time))
+    print('  # images: %d ' % (len(images)))
+    print('  # labels: %d ' % (len(labels)))
+    print('  time taken: %.3f seconds' % (time.time() - data_load_time))
 
 
     # 
@@ -67,21 +61,17 @@ def main():
     print('\nLoad pre-trained model:')
 
     # Normalise the image data
-    # image_prep = ImagePreprocessing()
-    # image_prep.add_featurewise_zero_center()
-    # image_prep.add_featurewise_stdnorm()
+    image_prep = ImagePreprocessing()
+    image_prep.add_featurewise_zero_center()
+    image_prep.add_featurewise_stdnorm()
 
     # Convolutional network
-    # network = input_data(shape=[None, 200, 200, 1], name='input', data_preprocessing=image_prep)
-    network = input_data(shape=[None, 200, 200, 1], name='input')
-    # network = conv_2d(network, 12, 3, activation='relu', regularizer='L2')
-    network = conv_2d(network, 12, 3, activation='relu')
+    network = input_data(shape=[None, 200, 200, 1], name='input', data_preprocessing=image_prep)
+    network = conv_2d(network, 12, 3, activation='relu', regularizer='L2')
     network = max_pool_2d(network, 2)
-    # network = conv_2d(network, 24, 3, activation='relu', regularizer='L2')
-    network = conv_2d(network, 24, 3, activation='relu')
+    network = conv_2d(network, 24, 3, activation='relu', regularizer='L2')
     network = max_pool_2d(network, 2)
-    # network = conv_2d(network, 36, 3, activation='relu', regularizer='L2')
-    network = conv_2d(network, 36, 3, activation='relu')
+    network = conv_2d(network, 36, 3, activation='relu', regularizer='L2')
     network = max_pool_2d(network, 2)
     network = fully_connected(network, 10, activation='tanh')
     network = fully_connected(network, 2, activation='softmax')
@@ -94,14 +84,14 @@ def main():
     print('  file: %s' % (MODEL_FILE))
     print('  time taken: %.3f seconds' % (time.time() - model_load_time))
 
+
     # 
-    # 2. Classify images
+    # 3. Classify images
     # 
     classify_time = time.time()
     print('\nClassify images:')
 
-
-    predict(IMAGES_FOLDER, OUTPUT_FOLDER, model, 0.9)
+    output_df = predict(IMAGES_FOLDER, OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model)
 
     # print('  predictions:')
     # for index, value in class_counts_df.iteritems():
@@ -109,24 +99,25 @@ def main():
     print('  time taken: %.3f seconds' % (time.time() - classify_time))
 
 
-    # # 
-    # # 3. Save prediction results
-    # # 
+    # 
+    # 4. Save prediction results
+    # 
 
-    # # Reorder the DataFrame columns
-    # output_df = output_df[['image', 'label', 'prediction', 'confidence']]
+    # Reorder the DataFrame columns
+    output_df = output_df[['image', 'confidence']]
 
-    # # Write output to results file
-    # output_df.to_csv(s.RESULTS_FILE, index=False)
+    # Write output to results file
+    output_df.to_csv(RESULTS_FILE, index=False)
+
 
     # 
-    # 4. Display messages to the console
+    # 5. Display messages to the console
     #
 
     print('\nTotal time: %.3f seconds\n' % (time.time() - start_time))
 
     print('Generated file:')
-    # print('  %s\n' % (s.RESULTS_FILE))
+    print('  %s\n' % (RESULTS_FILE))
 
 
 def tile(filename, w, h):
@@ -166,25 +157,35 @@ def tile(filename, w, h):
     return image_tiles
 
 
-def predict(images_folder, output_folder, model, tolerance):
+def predict(images_folder, output_folder, threshold, model):
     ''' Returns 1 or 0 based on if transient object is present. If 1, out_filename_tilename is created '''
-    outf = {}
+    # Store classification predictions and scores for images
+    results = pd.DataFrame()
 
-    for files in os.listdir(images_folder):
-        SET = tile(images_folder + '/' + files, 200, 200)
+    for file in os.listdir(images_folder):
+        tiles = tile(images_folder + '/' + file, 200, 200)
         flag = 0
 
-        for i in range(len(SET)): 
-            result = model.predict([np.reshape(SET[i], [200, 200, 1])])[0][1]
+        for i in range(len(tiles)): 
+            score = model.predict([np.reshape(tiles[i], [200, 200, 1])])[0][1]
+            
+            if (score >= threshold):
+                filename = output_folder + '/out_' + file + '_' + str(i) + '.jpg'
 
-            if (result > tolerance):
-                misc.imsave(output_folder + '/out_' + files + '_' + str(i) + '.jpg', SET[i])
+                # Append the prediction to the output DataFrame
+                results = results.append({
+                    'image': file, 
+                    'confidence': round(score, 5)}, 
+                    ignore_index=True)
+                misc.imsave(filename, tiles[i])
                 flag = 1
 
-        if flag == 1:
-            print (files + '--->1')
+        if flag:
+            print (file + '--->1')
         else:
-            print (files + '--->0')
+            print (file + '--->0')
+
+    return results
 
 
 if __name__ == '__main__':
