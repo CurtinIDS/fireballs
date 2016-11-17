@@ -20,9 +20,11 @@ VALIDATION_SAMPLES = int(TRAINING_SAMPLES * 0.1)
 # Transient / no transient ratio
 BIAS = 0.5
 # Brightness of the transient objects (streaks) drawn
-BRIGHTNESS_VALUES = [250, 200, 150]
+BRIGHTNESS_VALUES = [250, 200, 150, 100]
+BRIGHTNESS_THRESHOLD_VALUES = [0.35, 0.35, 0.35, 0.50]
 STREAK_BRIGHTNESS_INDEX = 0
 STREAK_BRIGHTNESS = BRIGHTNESS_VALUES[STREAK_BRIGHTNESS_INDEX]
+BRIGHTNESS_THRESHOLD = BRIGHTNESS_THRESHOLD_VALUES[STREAK_BRIGHTNESS_INDEX]
 # Seed numbers used for random number generator to repliciating experimental results
 TRAINING_SEED = STREAK_BRIGHTNESS_INDEX + 5656
 VALIDATION_SEED = STREAK_BRIGHTNESS_INDEX + 2961
@@ -133,7 +135,7 @@ def generate_images(folder, samples, random_seed):
             if ((dist(A) > 30) and (dist(A) < 300)): 
 
                 color_rnd = 0
-                while (color_rnd < 0.35): 
+                while (color_rnd < BRIGHTNESS_THRESHOLD): 
                     # Brightness should be over certain threshold, lower the brightness -> harder to train, more resilient
                     color_rnd = random() 
 
