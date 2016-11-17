@@ -7,6 +7,7 @@ from __future__ import print_function
 
 import os
 import glob
+import math
 import time
 import tflearn
 import numpy as np
@@ -20,7 +21,7 @@ from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.estimator import regression
 from tflearn.data_preprocessing import ImagePreprocessing
 
-EXPERIMENT_NAME = 'exp7'
+EXPERIMENT_NAME = 'exp8'
 MODEL_FILE = s.MODELS_DIRECTORY + EXPERIMENT_NAME
 IMAGES_FOLDER = s.CACHE_DIRECTORY + 'astrosmall00_mobile'
 OUTPUT_FOLDER = s.OUTPUT_DIRECTORY + 'test'
@@ -104,7 +105,7 @@ def main():
     # 
 
     # Reorder the DataFrame columns
-    output_df = output_df[['image', 'confidence']]
+    output_df = output_df[['image', 'confidence', 'x0', 'y0', 'x1', 'y1', 'tile']]
 
     # Write output to results file
     output_df.to_csv(RESULTS_FILE, index=False)
@@ -120,41 +121,50 @@ def main():
     print('  %s\n' % (RESULTS_FILE))
 
 
-def tile(filename, w, h):
-    i = 0
-    j = 0
-    w_x = 0
-    w_y = 0
+def tile(filename, width, height):
+    # Initialise variables
+    width_x = 0
+    width_y = 0
     image_tiles = []
-    image = misc.imread(filename)
+    image_coordinates = []
 
-    X = image.shape[0]
-    Y = image.shape[1]
+    # Load the image    
+    image = misc.imread(filename)
+    Y = image.shape[0]
+    X = image.shape[1]
+
+    # Resize the image if needed
     if ((Y > 1228) or (X > 1840)):
         image = misc.imresize(image, [1228, 1840])
     
-    # Divide vertically into Y/h tiles
-    while (j < int(Y / h)):  
-        j += 1
+    # Number of tiles
+    n_rows = int(math.ceil(Y / float(height)))
+    n_cols = int(math.ceil(X / float(width)))
 
-        if (j == int(Y / h)):
-            w_y = (Y - h)
-        i = 0
-        w_x = 0
+    # Divide the image vertically into tiles
+    for j in range(n_rows):
 
-        # Divide horizontally into X/w tiles
-        while (i < int(X / w)): 
-            i += 1
+        # Make the last tile overlap with the second last tile to ensure its dimensions are 200 x 200 pixels
+        if (j == n_rows - 1):
+            width_y = (Y - height)
+        
+        width_x = 0
 
-            if (i == int(X / w)):
-                w_x = (X - w)
+        # Divide the image horizontally into tiles
+        for i in range(n_cols):
+            # Make the last tile overlap with the second last tile to ensure its dimensions are 200 x 200 pixels
+            if (i == n_cols - 1):
+                width_x = (X - width)
 
+            # Conver the image data to float in order to apply normalisation for classification
             image = image.astype('float32')
-            image_tiles.append(image[w_x:w_x + w, w_y:w_y + h])
+            image_tiles.append(image[width_y:width_y + height, width_x:width_x + width])
+            image_coordinates.append((width_x, width_y, width_x + width, width_y + height))
 
-            w_x += w
-        w_y += h
-    return image_tiles
+            width_x += width
+        width_y += height
+
+    return image_tiles, image_coordinates
 
 
 def predict(images_folder, output_folder, threshold, model):
@@ -163,19 +173,28 @@ def predict(images_folder, output_folder, threshold, model):
     results = pd.DataFrame()
 
     for file in os.listdir(images_folder):
-        tiles = tile(images_folder + '/' + file, 200, 200)
+        tiles, coords = tile(images_folder + '/' + file, 200, 200)
         flag = 0
 
         for i in range(len(tiles)): 
+            # Run the model to determine if this tile contains a transient object
             score = model.predict([np.reshape(tiles[i], [200, 200, 1])])[0][1]
-            
+
             if (score >= threshold):
-                filename = output_folder + '/out_' + file + '_' + str(i) + '.jpg'
+                tile_row = int(i / 10)
+                tile_column = int(i % 10)
+
+                filename = output_folder + '/out_' + file + '_' + str(tile_row) + '_' + str(tile_column) + '.jpg'
 
                 # Append the prediction to the output DataFrame
                 results = results.append({
                     'image': file, 
-                    'confidence': round(score, 5)}, 
+                    'confidence': round(score, 5),
+                    'x0': coords[i][0],
+                    'y0': coords[i][1],
+                    'x1': coords[i][2],
+                    'y1': coords[i][3],
+                    'tile': i},
                     ignore_index=True)
                 misc.imsave(filename, tiles[i])
                 flag = 1
