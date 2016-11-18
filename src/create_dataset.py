@@ -22,8 +22,8 @@ VALIDATION_SAMPLES = int(TRAINING_SAMPLES * 0.1)
 BIAS = 0.5
 # Brightness of the transient objects (streaks) drawn
 BRIGHTNESS_VALUES = [250, 200, 150, 100]
-BRIGHTNESS_THRESHOLD_VALUES = [0.35, 0.40, 0.45, 0.60]
-STREAK_BRIGHTNESS_INDEX = 3
+BRIGHTNESS_THRESHOLD_VALUES = [0.35, 0.40, 0.45, 0.70]
+STREAK_BRIGHTNESS_INDEX = 0
 STREAK_BRIGHTNESS = BRIGHTNESS_VALUES[STREAK_BRIGHTNESS_INDEX]
 BRIGHTNESS_THRESHOLD = BRIGHTNESS_THRESHOLD_VALUES[STREAK_BRIGHTNESS_INDEX]
 # Seed numbers used for random number generator to repliciating experimental results
@@ -108,9 +108,6 @@ def generate_images(folder, samples, random_seed):
         im = Image.open(TEMP_FOLDER + '/' + str(myrand) + '.jpg')
         X = im.size[0]
         Y = im.size[1]
-
-        # Calculate the average brightness of the background image
-        average_brightness = int(np.mean(im))
         
         # Resize the image if required 
         if ((X > 1840) or (Y > 1228)):
@@ -132,6 +129,9 @@ def generate_images(folder, samples, random_seed):
         A = [(random() * im.size[0], random() * im.size[1], random() * im.size[0], random() * im.size[1])]
         myrand = str(myrand)
 
+        # Calculate the average brightness of the background image tile
+        tile_brightness = int(np.mean(im))
+
         has_meteor = False
 
         if (random() > BIAS):
@@ -139,23 +139,24 @@ def generate_images(folder, samples, random_seed):
             if ((dist(A) > 30) and (dist(A) < 300)): 
 
                 color_rnd = 0
-
-                # If the background image is very bright then don't create streaks that are too faint
-                if average_brightness > 30:
-                    brightness_threshold = min(0.90, 3 * BRIGHTNESS_THRESHOLD)
-                else:
-                    brightness_threshold = BRIGHTNESS_THRESHOLD 
-
-                while (color_rnd < brightness_threshold): 
-                    # Brightness should be over certain threshold, lower the brightness -> harder to train, more resilient
+                # Brightness should be over certain threshold, lower the brightness -> harder to train, more resilient
+                while (color_rnd < BRIGHTNESS_THRESHOLD): 
                     color_rnd = random() 
 
+                streak_brightness = color_rnd * STREAK_BRIGHTNESS
+                # Ensure the streak is brighter than the tile average brightness
+                if tile_brightness > streak_brightness:
+                    streak_brightness = min(tile_brightness + 40, 255)
+                # Enhance the streak brightness if the difference between the tile average is small
+                elif streak_brightness - tile_brightness < 35:
+                    streak_brightness = min(streak_brightness + 35, 255)
+                
                 width_rand = 0
                 while (width_rand < 0.5):
                     # Width should be less than 2 px
                     width_rand = int(random() * 2) 
 
-                draw.line([A[0][0], A[0][1], A[0][2], A[0][3]], fill=int(color_rnd * STREAK_BRIGHTNESS), width=width_rand)
+                draw.line([A[0][0], A[0][1], A[0][2], A[0][3]], fill=int(streak_brightness), width=width_rand)
                 # Add _y to files that contain transient objects
                 myrand = myrand + '_y' 
                 has_meteor = True
@@ -163,9 +164,9 @@ def generate_images(folder, samples, random_seed):
                 
 
         if has_meteor:
-            im.save(folder + '/1/' + str(i) + '_' + str(average_brightness) + '_' + str(myrand) + '.jpg')
+            im.save(folder + '/1/' + str(i) + '_' + str(tile_brightness) + '_' + str(myrand) + '.jpg')
         else:
-            im.save(folder + '/0/' + str(i) + '_' + str(average_brightness) + '_' + str(myrand) + '.jpg')
+            im.save(folder + '/0/' + str(i) + '_' + str(tile_brightness) + '_' + str(myrand) + '.jpg')
 
 
 def dist(A): 
