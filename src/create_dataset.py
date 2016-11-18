@@ -4,6 +4,7 @@ and placed on real background image tiles of the night sky
 
 """
 import math
+import numpy as np
 import os
 import shutil
 import settings as s
@@ -21,8 +22,8 @@ VALIDATION_SAMPLES = int(TRAINING_SAMPLES * 0.1)
 BIAS = 0.5
 # Brightness of the transient objects (streaks) drawn
 BRIGHTNESS_VALUES = [250, 200, 150, 100]
-BRIGHTNESS_THRESHOLD_VALUES = [0.35, 0.40, 0.50, 0.70]
-STREAK_BRIGHTNESS_INDEX = 0
+BRIGHTNESS_THRESHOLD_VALUES = [0.35, 0.40, 0.45, 0.60]
+STREAK_BRIGHTNESS_INDEX = 3
 STREAK_BRIGHTNESS = BRIGHTNESS_VALUES[STREAK_BRIGHTNESS_INDEX]
 BRIGHTNESS_THRESHOLD = BRIGHTNESS_THRESHOLD_VALUES[STREAK_BRIGHTNESS_INDEX]
 # Seed numbers used for random number generator to repliciating experimental results
@@ -97,7 +98,7 @@ def generate_images(folder, samples, random_seed):
     # Seed the random number generator   
     seed(random_seed)
     image_len = len(os.listdir(SOURCE_FOLDER))
-
+ 
     for i in range(samples):
 
         # Select a random background image without meteorites
@@ -107,6 +108,9 @@ def generate_images(folder, samples, random_seed):
         im = Image.open(TEMP_FOLDER + '/' + str(myrand) + '.jpg')
         X = im.size[0]
         Y = im.size[1]
+
+        # Calculate the average brightness of the background image
+        average_brightness = int(np.mean(im))
         
         # Resize the image if required 
         if ((X > 1840) or (Y > 1228)):
@@ -135,7 +139,14 @@ def generate_images(folder, samples, random_seed):
             if ((dist(A) > 30) and (dist(A) < 300)): 
 
                 color_rnd = 0
-                while (color_rnd < BRIGHTNESS_THRESHOLD): 
+
+                # If the background image is very bright then don't create streaks that are too faint
+                if average_brightness > 30:
+                    brightness_threshold = min(0.90, 3 * BRIGHTNESS_THRESHOLD)
+                else:
+                    brightness_threshold = BRIGHTNESS_THRESHOLD 
+
+                while (color_rnd < brightness_threshold): 
                     # Brightness should be over certain threshold, lower the brightness -> harder to train, more resilient
                     color_rnd = random() 
 
@@ -149,11 +160,12 @@ def generate_images(folder, samples, random_seed):
                 myrand = myrand + '_y' 
                 has_meteor = True
                 del draw
+                
 
         if has_meteor:
-            im.save(folder + '/1/' + str(i) + '_' + str(myrand) + '.jpg')
+            im.save(folder + '/1/' + str(i) + '_' + str(average_brightness) + '_' + str(myrand) + '.jpg')
         else:
-            im.save(folder + '/0/' + str(i) + '_' + str(myrand) + '.jpg')
+            im.save(folder + '/0/' + str(i) + '_' + str(average_brightness) + '_' + str(myrand) + '.jpg')
 
 
 def dist(A): 
