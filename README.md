@@ -34,4 +34,9 @@ Data processing and statistical analysis scripts
 * CIRA
  * Paul Hancock (paul.hancock@curtin.edu.au)
  * Xiang Zhang (xiang.zhang11@postgrad.curtin.edu.au)
+
+* Desert Fireball Network (DFN)
+ * Hadrien Devillepoix (hadriendvpx@gmail.com)
+
+* International Centre for Radio Astronomy Research (ICRAR)
  * Randall Wayth (r.wayth@curtin.edu.au)
