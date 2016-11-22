@@ -21,13 +21,14 @@ from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.estimator import regression
 from tflearn.data_preprocessing import ImagePreprocessing
 
-EXPERIMENT_NAME = 'exp8'
+EXPERIMENT_NAME = 'exp5'
 MODEL_FILE = s.MODELS_DIRECTORY + EXPERIMENT_NAME
-IMAGES_FOLDER = s.CACHE_DIRECTORY + 'astrosmall00_mobile'
+IMAGES_FOLDER = s.CACHE_DIRECTORY + 'astrosmall01'
 OUTPUT_FOLDER = s.OUTPUT_DIRECTORY + 'test'
 LABELS_FILE = s.CACHE_DIRECTORY + 'astrosmall00_mobile_labels.txt'
 CONFIDENCE_THRESHOLD = 0.9
-RESULTS_FILE = s.RESULTS_DIRECTORY + EXPERIMENT_NAME + '.csv'
+TILE_BRIGHTNESS_THRESHOLD = 190
+RESULTS_FILE = s.RESULTS_DIRECTORY + EXPERIMENT_NAME + '_test_.csv'
 
 
 def main():
@@ -178,26 +179,32 @@ def predict(images_folder, output_folder, threshold, model):
 
         for i in range(len(tiles)): 
             # Run the model to determine if this tile contains a transient object
-            score = model.predict([np.reshape(tiles[i], [200, 200, 1])])[0][1]
 
-            if (score >= threshold):
-                tile_row = int(i / 10)
-                tile_column = int(i % 10)
+            # Calculate the average brightness of the background image tile
+            tile_brightness = int(np.mean(tiles[i]))
+            
+            # Don't classify tiles that are too bright
+            if tile_brightness < TILE_BRIGHTNESS_THRESHOLD:                
+                score = model.predict([np.reshape(tiles[i], [200, 200, 1])])[0][1]
 
-                filename = output_folder + '/out_' + file + '_' + str(tile_row) + '_' + str(tile_column) + '.jpg'
+                if (score >= threshold):
+                    tile_row = int(i / 10)
+                    tile_column = int(i % 10)
 
-                # Append the prediction to the output DataFrame
-                results = results.append({
-                    'image': file, 
-                    'confidence': round(score, 5),
-                    'x0': coords[i][0],
-                    'y0': coords[i][1],
-                    'x1': coords[i][2],
-                    'y1': coords[i][3],
-                    'tile': i},
-                    ignore_index=True)
-                misc.imsave(filename, tiles[i])
-                flag = 1
+                    filename = output_folder + '/out_' + file + '_' + str(tile_row) + '_' + str(tile_column) + '.jpg'
+
+                    # Append the prediction to the output DataFrame
+                    results = results.append({
+                        'image': file, 
+                        'confidence': round(score, 5),
+                        'x0': coords[i][0],
+                        'y0': coords[i][1],
+                        'x1': coords[i][2],
+                        'y1': coords[i][3],
+                        'tile': i},
+                        ignore_index=True)
+                    misc.imsave(filename, tiles[i])
+                    flag = 1
 
         if flag:
             print (file + '--->1')
