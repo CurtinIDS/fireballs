@@ -50,7 +50,7 @@ def main():
     # 
 
     # print('\n-- Classify dataset  --')
-    # subprocess.call('python classify_images.py', shell=True)
+    # subprocess.call('python retrain_classify_images.py', shell=True)
 
     # 
     # 4. Summarise the experimental results

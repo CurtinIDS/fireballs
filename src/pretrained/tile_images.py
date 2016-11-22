@@ -51,7 +51,7 @@ def main():
     df.drop('temp', axis=1, inplace=True)
 
     # Filter tiling to a specific camera
-    # df = df[df['camera'] == s.CAMERAS[0]]
+    df = df[df['camera'] == s.CAMERAS[0]]
    
     # NOTE: Commented out after we have a large enough training dataset
     # Only select a number of non meteor images for creating background tiles
@@ -248,7 +248,8 @@ def _generate_tiles_inner(image, rows, cols, height, width, transients):
             tile_filename += '.' + filename_parts[1] + '.' + filename_parts[2]
 
             # Save the tile image to the correct labelled folder
-            io.imsave(tile_filename, image_data[y0:y1, x0:x1, :])
+            # io.imsave(tile_filename, image_data[y0:y1, x0:x1, :])
+            io.imsave(tile_filename, image_data[y0:y1, x0:x1])
 
 
 if __name__ == '__main__':
