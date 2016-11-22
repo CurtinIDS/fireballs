@@ -60,7 +60,6 @@ def main():
         
     # Convolutional network
     network = input_data(shape=[None, 200, 200, 1], name='input', data_preprocessing=image_prep)
-    # network = input_data(shape=[None, 200, 200, 1], name='input')
     network = conv_2d(network, 12, 3, activation='relu', regularizer='L2')
     network = max_pool_2d(network, 2)
     network = conv_2d(network, 24, 3, activation='relu', regularizer='L2')
