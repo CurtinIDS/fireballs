@@ -44,7 +44,8 @@ def main():
     copy_files(images, SOURCE_FOLDER, RESULTS_FOLDER)
 
     print('  file: %s' % (RESULTS_FILE))
-    print('  # records: %d' % (len(images)))
+    print('  # images: %d' % (len(images)))
+    print('  # tiles: %d' % (len(df)))
     print('  time taken: %.3f seconds' % (time.time() - data_load_time))
 
 
@@ -82,34 +83,18 @@ def main():
             y1 = int(tile['y1'])
 
             # Check if we are evaluating tiles at the bottom or right side of the image
-
-            # Bottom right tile
-            # if height == y1 and width == x1:
-            #     # Check if the above and left tile is already highlighted
-            #         # Check if the above tile is already highlighted
-            #         above_tile_y1 = int(height - overlap_height)
-            #         above_tile = tiles[(tiles['x0'] == x0) & (tiles['y1'] == above_tile_y1)]
-            #         # Adjust the highlighting height for the overlapping tile
-            #         if len(above_tile):
-            #             y0 = height - overlap_height
-
-            # else:
-
-
-            # Bottom tiles
-            if height == y1:
+            if height == y1 or width == x1:
                 # Check if the above tile is already highlighted
                 above_tile_y1 = int(height - overlap_height)
-                above_tile = tiles[(tiles['x0'] == x0) & (tiles['y1'] == above_tile_y1)]
-                # Adjust the highlighting height for the overlapping tile
-                if len(above_tile):
-                    y0 = above_tile_y1
-                    
-            # Right tiles
-            if width == x1:
+                above_tile = tiles[(tiles['x0'] == x0) & (tiles['y1'] == above_tile_y1) & (tiles['tile'] != tile['tile'])]
+
                 # Check if the left tile is already highlighted
                 left_tile_x1 = int(width - overlap_width)
-                left_tile = tiles[(tiles['y0'] == y0) & (tiles['x1'] == left_tile_x1)]
+                left_tile = tiles[(tiles['y0'] == y0) & (tiles['x1'] == left_tile_x1) & (tiles['tile'] != tile['tile'])]
+            
+                # Adjust the highlighting height for the overlapping tile    
+                if len(above_tile):
+                    y0 = above_tile_y1
                 
                 # Adjust the highlighting width for the overlap tile
                 if len(left_tile):
