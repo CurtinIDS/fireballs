@@ -9,9 +9,13 @@ OUTPUT_DIRECTORY = '../output/'
 RESULTS_DIRECTORY = '../results/'
 MODELS_DIRECTORY = '../models/'
 SYNTHETIC_DIRECTORY = CACHE_DIRECTORY + 'synthetic/'
+# Shared dataset and model settings
+TILE_WIDTH = 200
+TILE_HEIGHT = 200
+
 # Experiment
 CAMERAS = ['astrosmall00_mobile', 'astrosmall01']
 EXPERIMENT_NAME = CAMERAS[0]
-LABELS = ['transients', 'other']
-LABEL_TRANSIENT = LABELS[0]
-LABEL_OTHER = LABELS[1]
+LABELS = ['other', 'transients']
+LABEL_OTHER = LABELS[0]
+LABEL_TRANSIENT = LABELS[1]

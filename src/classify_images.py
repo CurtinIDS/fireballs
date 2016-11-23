@@ -21,14 +21,13 @@ from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.estimator import regression
 from tflearn.data_preprocessing import ImagePreprocessing
 
-EXPERIMENT_NAME = 'exp5'
-MODEL_FILE = s.MODELS_DIRECTORY + EXPERIMENT_NAME
+EXPERIMENT_NAME = 'exp6'
+MODEL_FILE = s.MODELS_DIRECTORY + 'transients'
 IMAGES_FOLDER = s.CACHE_DIRECTORY + 'astrosmall01'
 OUTPUT_FOLDER = s.OUTPUT_DIRECTORY + 'test'
-LABELS_FILE = s.CACHE_DIRECTORY + 'astrosmall00_mobile_labels.txt'
 CONFIDENCE_THRESHOLD = 0.9
 TILE_BRIGHTNESS_THRESHOLD = 180
-RESULTS_FILE = s.RESULTS_DIRECTORY + EXPERIMENT_NAME + '_test_.csv'
+RESULTS_FILE = s.RESULTS_DIRECTORY + EXPERIMENT_NAME + '.csv'
 
 
 def main():
@@ -46,7 +45,7 @@ def main():
     images = glob.glob(IMAGES_FOLDER + '/*.jpg')
 
     # Retrieve the class labels
-    labels = [line.rstrip() for line in open(LABELS_FILE)]
+    labels = S.LABELS
 
     # List to store classification predictions and scores for images
     output_df = pd.DataFrame()
@@ -123,6 +122,7 @@ def main():
 
 
 def tile(filename, width, height):
+    ''' Create tiles of the image to be used for classification '''
     # Initialise variables
     width_x = 0
     width_y = 0

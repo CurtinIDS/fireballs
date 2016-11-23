@@ -20,9 +20,9 @@ from tflearn.layers.normalization import local_response_normalization
 from tflearn.data_preprocessing import ImagePreprocessing
 
 LOAD_EXISTING_MODEL = False
-EXISTING_MODEL = '../models/synthetic'
-MODEL = 'synthetic'
-CHECKPOINT_FOLDER = s.OUTPUT_DIRECTORY + MODEL
+EXISTING_MODEL = s.MODELS_DIRECTORY + 'exp3'
+MODEL_NAME = 'synthetic'
+CHECKPOINT_FOLDER = s.OUTPUT_DIRECTORY + MODEL_NAME
 TRAINING_FOLDER = s.SYNTHETIC_DIRECTORY + 'training'
 VALIDATION_FOLDER = s.SYNTHETIC_DIRECTORY + 'validation'
 

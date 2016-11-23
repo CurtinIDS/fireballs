@@ -13,8 +13,6 @@ from random import random, seed, randrange
 from shutil import copyfile
 from PIL import Image, ImageDraw
 
-TILE_WIDTH = 200
-TILE_HEIGHT = 200
 # Number of samples to generate
 TRAINING_SAMPLES = 1000
 VALIDATION_SAMPLES = int(TRAINING_SAMPLES * 0.1)
@@ -118,13 +116,13 @@ def generate_images(folder, samples, random_seed):
         marker_y = height * 2
 
         # Randomly select the area within the image that will be used as the background tile
-        while ((marker_x + TILE_WIDTH) > width):
+        while ((marker_x + s.TILE_WIDTH) > width):
             marker_x = int(random() * width)
-            while ((marker_y + TILE_HEIGHT) > height):
+            while ((marker_y + s.TILE_HEIGHT) > height):
                 marker_y = int(random() * height)
 
         # 0.034 - 0.039 seconds (slower operation on Mac OSX than Linux)
-        im = im.crop((marker_x, marker_y, marker_x + TILE_WIDTH, marker_y + TILE_HEIGHT))
+        im = im.crop((marker_x, marker_y, marker_x + s.TILE_WIDTH, marker_y + s.TILE_HEIGHT))
         draw = ImageDraw.Draw(im)
         A = [(random() * im.size[0], random() * im.size[1], random() * im.size[0], random() * im.size[1])]
         myrand = str(myrand)

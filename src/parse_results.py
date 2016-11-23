@@ -20,8 +20,6 @@ RESULTS_FOLDER = s.RESULTS_DIRECTORY + FOLDER_NAME
 RESULTS_FILE = s.RESULTS_DIRECTORY + FOLDER_NAME + '.csv'
 # Brightness factor to increase tiles containing transient objects 
 BRIGHTNESS_FACTOR = 30
-TILE_WIDTH = 200
-TILE_HEIGHT = 200
 
 
 def main(): 
@@ -61,8 +59,8 @@ def main():
     width = int(image.shape[1])
 
     # Determine the amount of overlap of tiles at the bottom or the right side of the image
-    overlap_height = height % TILE_HEIGHT
-    overlap_width = width % TILE_WIDTH
+    overlap_height = height % s.TILE_HEIGHT
+    overlap_width = width % s.TILE_WIDTH
 
     # Increase the brightnness of the selected coordinates /tiles
     for image in images:
