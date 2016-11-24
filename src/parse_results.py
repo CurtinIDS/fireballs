@@ -14,7 +14,7 @@ import settings as s
 
 from scipy import misc
 
-FOLDER_NAME = 'astrosmall01'
+FOLDER_NAME = 'test'
 SOURCE_FOLDER = s.CACHE_DIRECTORY + FOLDER_NAME + '/'
 RESULTS_FOLDER = s.RESULTS_DIRECTORY + FOLDER_NAME
 RESULTS_FILE = s.RESULTS_DIRECTORY + FOLDER_NAME + '.csv'

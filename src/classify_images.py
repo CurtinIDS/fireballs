@@ -21,12 +21,12 @@ from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.estimator import regression
 from tflearn.data_preprocessing import ImagePreprocessing
 
-EXPERIMENT_NAME = 'exp6'
+EXPERIMENT_NAME = 'exp5'
 MODEL_FILE = s.MODELS_DIRECTORY + 'transients'
 IMAGES_FOLDER = s.CACHE_DIRECTORY + 'astrosmall01'
 OUTPUT_FOLDER = s.OUTPUT_DIRECTORY + 'test'
-CONFIDENCE_THRESHOLD = 0.9
-TILE_BRIGHTNESS_THRESHOLD = 180
+CONFIDENCE_THRESHOLD = 0.5
+TILE_BRIGHTNESS_THRESHOLD = 150
 RESULTS_FILE = s.RESULTS_DIRECTORY + EXPERIMENT_NAME + '.csv'
 
 
@@ -45,7 +45,7 @@ def main():
     images = glob.glob(IMAGES_FOLDER + '/*.jpg')
 
     # Retrieve the class labels
-    labels = S.LABELS
+    labels = s.LABELS
 
     # List to store classification predictions and scores for images
     output_df = pd.DataFrame()
@@ -173,9 +173,11 @@ def predict(images_folder, output_folder, threshold, model):
     # Store classification predictions and scores for images
     results = pd.DataFrame()
 
-    for file in os.listdir(images_folder):
-        tiles, coords = tile(images_folder + '/' + file, 200, 200)
+    for file in glob.glob(images_folder + '/*.jpg'):
+        tiles, coords = tile(file, 200, 200)
         flag = 0
+
+        filename = file.split('/')[-1]
 
         for i in range(len(tiles)): 
             # Run the model to determine if this tile contains a transient object
@@ -191,11 +193,11 @@ def predict(images_folder, output_folder, threshold, model):
                     tile_row = int(i / 10)
                     tile_column = int(i % 10)
 
-                    filename = output_folder + '/out_' + file + '_' + str(tile_row) + '_' + str(tile_column) + '.jpg'
+                    output_filename = output_folder + '/out_' + filename + '_' + str(tile_row) + '_' + str(tile_column) + '.jpg'
 
                     # Append the prediction to the output DataFrame
                     results = results.append({
-                        'image': file, 
+                        'image': filename, 
                         'confidence': round(score, 5),
                         'x0': coords[i][0],
                         'y0': coords[i][1],
@@ -203,13 +205,13 @@ def predict(images_folder, output_folder, threshold, model):
                         'y1': coords[i][3],
                         'tile': i},
                         ignore_index=True)
-                    misc.imsave(filename, tiles[i])
+                    misc.imsave(output_filename, tiles[i])
                     flag = 1
 
         if flag:
-            print (file + '--->1')
+            print (filename + '--->1')
         else:
-            print (file + '--->0')
+            print (filename + '--->0')
 
     return results
 
