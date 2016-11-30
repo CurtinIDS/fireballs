@@ -37,6 +37,3 @@ Data processing and statistical analysis scripts
 
 * Desert Fireball Network (DFN)
  * Hadrien Devillepoix (hadriendvpx@gmail.com)
-
-* International Centre for Radio Astronomy Research (ICRAR)
- * Randall Wayth (r.wayth@curtin.edu.au)
