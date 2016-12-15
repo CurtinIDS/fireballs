@@ -45,9 +45,35 @@ Data processing and statistical analysis scripts
 ## Usage
 
 ### Data pre-processsing
-The code works on jpeg images. If large, they need to be downsampled, for example using:
-`convert in.jpg -resize 50% out.jpg`
+The code works on JPEG images. Images should be copied to a folder within the `cache` directory. e.g. `cache/camera1/
+
+Images need to be resized and converted to grayscale for the model. This can be performed using the `mogrify` tool in the ImageMagick software.
+
+```
+cd cache/[IMAGES_FOLDER]
+mogrify -resize 1840x1228 *jpg
+mogrify -type Grayscale *jpg
+```
 
 ### Running the detection
 
+Specify the folder name of images [`IMAGES_FOLDER`] stored in the `cache` directory
+
+TODO: Kevin to update code to make this easier
+
+Classify the images:
+
+`python classify_images.py`
+
+Generate annotated images that highlight tiles where transient objects are detected
+
+`python parse_results.py`
+
+Result files:
+
+* CSV containing detection coordinates: `results/[IMAGES_FOLDER].csv`
+* Annotated images with highlighted detection tiles: `results/[IMAGE_FOLDER]/`
+
 ### Training the model
+
+
