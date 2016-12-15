@@ -37,3 +37,17 @@ Data processing and statistical analysis scripts
 
 * Desert Fireball Network (DFN)
  * Hadrien Devillepoix (hadriendvpx@gmail.com)
+ 
+
+## Installation
+`pip install -r requirements.txt`
+
+## Usage
+
+### Data pre-processsing
+The code works on jpeg images. If large, they need to be downsampled, for example using:
+`convert in.jpg -resize 50% out.jpg`
+
+### Running the detection
+
+### Training the model
