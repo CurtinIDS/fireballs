@@ -45,7 +45,7 @@ Data processing and statistical analysis scripts
 ## Usage
 
 ### Data pre-processsing
-The code works on JPEG images. Images should be copied to a folder within the `cache` directory. e.g. `cache/camera1/
+The code works on JPEG images. Images should be copied to a folder `[IMAGES_FOLDER]` within the `cache` directory. e.g. `cache/camera1/`
 
 Images need to be resized and converted to grayscale for the model. This can be performed using the `mogrify` tool in the ImageMagick software.
 
@@ -57,9 +57,11 @@ mogrify -type Grayscale *jpg
 
 ### Running the detection
 
-Specify the folder name of images [`IMAGES_FOLDER`] stored in the `cache` directory
+Specify the folder name of images `[IMAGES_FOLDER]` stored in the `cache` directory
 
 TODO: Kevin to update code to make this easier
+
+The model files are located within the `models` folder. The default detection model used is `models/transients`
 
 Classify the images:
 
@@ -76,4 +78,8 @@ Result files:
 
 ### Training the model
 
+`python train_model.py`
 
+### Generating synthetic datasets
+
+`python create_dataset.py`
