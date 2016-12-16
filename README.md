@@ -196,4 +196,4 @@ If you want to use the synthetically generated dataset for training the model th
 
 ### Visualising the model
 
-`jupyter-noteboook src/visualise_cnn.ipynb`
+`jupyter-notebook src/visualise_cnn.ipynb`
