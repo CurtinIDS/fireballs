@@ -1,30 +1,6 @@
 # Fireballs
 
-Data processing and analysis scripts for detecting fireballs from optical and radio astronomy images for the Curtin Institute for Radio Astronomy (CIRA).
-
-**cache/**
-
-Preprocessed datasets generated from raw data
-
-**data/**
-
-Raw data files. Datasets that are sensitive or large are not committed to this remote repository. Data must be stored locally in this folder to run the scripts.
-
-**docs/**
-
-Project related documents
-
-**output/**
-
-Output files generated from scripts
-
-**results/**
-
-Machine learning experiment results
-
-**src/**
-
-Data processing and statistical analysis scripts
+Data processing and analysis scripts for detecting transient objects (fireballs) from optical and radio astronomy images for the Curtin Institute for Radio Astronomy (CIRA).
 
 ## Contributors:
 * Curtin Institute for Computation (CIC)
@@ -42,12 +18,63 @@ Data processing and statistical analysis scripts
 ## Installation
 `pip install -r requirements.txt`
 
+### TensorFlow
+
+The code base has been developing using TensorFlow 0.11.0 RC0. Note that TensorFlow 0.12.0 RC0 introduced [breaking changes to the API](https://github.com/tensorflow/tensorflow/releases/tag/0.12.0-rc0) and will not work with the existing code. 
+
+Follow the below instructions to install the TensorFlow 0.11.0 RC0 version.
+
+```
+# Ubuntu/Linux 64-bit, CPU only, Python 2.7
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.11.0rc0-cp27-none-linux_x86_64.whl
+
+# Ubuntu/Linux 64-bit, GPU enabled, Python 2.7
+# Requires CUDA toolkit 8.0 and CuDNN v5. 
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-0.11.0rc0-cp27-none-linux_x86_64.whl
+
+# Mac OS X, CPU only, Python 2.7:
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-0.11.0rc0-py2-none-any.whl
+
+# Mac OS X, GPU enabled, Python 2.7:
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/mac/gpu/tensorflow_gpu-0.11.0rc0-py2-none-any.whl
+
+# Ubuntu/Linux 64-bit, CPU only, Python 3.4
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.11.0rc0-cp34-cp34m-linux_x86_64.whl
+
+# Ubuntu/Linux 64-bit, GPU enabled, Python 3.4
+# Requires CUDA toolkit 8.0 and CuDNN v5. 
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-0.11.0rc0-cp34-cp34m-linux_x86_64.whl
+
+# Ubuntu/Linux 64-bit, CPU only, Python 3.5
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.11.0rc0-cp35-cp35m-linux_x86_64.whl
+
+# Ubuntu/Linux 64-bit, GPU enabled, Python 3.5
+# Requires CUDA toolkit 8.0 and CuDNN v5. 
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-0.11.0rc0-cp35-cp35m-linux_x86_64.whl
+
+# Mac OS X, CPU only, Python 3.4 or 3.5:
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-0.11.0rc0-py3-none-any.whl
+
+# Mac OS X, GPU enabled, Python 3.4 or 3.5:
+$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/mac/gpu/tensorflow_gpu-0.11.0rc0-py3-none-any.whl
+```
+
+Install TensorFlow:
+
+```
+# Python 2
+$ sudo pip install --upgrade $TF_BINARY_URL
+
+# Python 3
+$ sudo pip3 install --upgrade $TF_BINARY_URL
+```
+
 ## Usage
 
 ### Data pre-processsing
 The code works on JPEG images. Images should be copied to a folder `[IMAGES_FOLDER]` within the `cache` directory. e.g. `cache/camera1/`
 
-Images need to be resized and converted to grayscale for the model. This can be performed using the `mogrify` tool in the ImageMagick software.
+Images need to be resized and converted to grayscale to run the model. This can be performed using the `mogrify` tool in the ImageMagick software.
 
 ```
 cd cache/[IMAGES_FOLDER]
@@ -73,7 +100,7 @@ Classify the images:
 Outputs:
 
 * CSV containing detection coordinates: `results/[IMAGES_FOLDER].csv`
-* Individual detected tile images: `output/[IMAGE_FOLDER`
+* 200x200 image tiles with detected transient objects : `output/[IMAGE_FOLDER]`
 
 
 Generate annotated images that highlight tiles where transient objects are detected
