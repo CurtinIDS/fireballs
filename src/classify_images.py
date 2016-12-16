@@ -90,7 +90,7 @@ def main():
     classify_time = time.time()
     print('\nClassify images:')
 
-    output_df = predict(s.IMAGES_FOLDER, OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model)
+    output_df = predict(s.IMAGES_FOLDER, s.OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model)
 
     # print('  predictions:')
     # for index, value in class_counts_df.iteritems():
