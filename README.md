@@ -22,7 +22,7 @@ Data processing and analysis scripts for detecting transient objects (fireballs)
 
 The code base has been developing using TensorFlow 0.11.0 RC0. Note that TensorFlow 0.12.0 RC0 introduced [breaking changes to the API](https://github.com/tensorflow/tensorflow/releases/tag/0.12.0-rc0) and will not work with the existing code. 
 
-Follow the below instructions to install the TensorFlow 0.11.0 RC0 version.
+Follow the below instructions to install the TensorFlow 0.11.0 RC0 version:
 
 ```
 # Ubuntu/Linux 64-bit, CPU only, Python 2.7
@@ -89,11 +89,12 @@ Specify the folder name of images `[IMAGES_FOLDER]` stored in the `cache` direct
 ```
 # User defined settings
 IMAGES_FOLDER_NAME = '[IMAGES_FOLDER]'
+...
 ```
 
 The model files are located within the `models` folder. The default detection model used is `models/transients`
 
-Classify the images:
+#### Classify the images
 
 `python classify_images.py`
 
@@ -103,7 +104,7 @@ Outputs:
 * 200x200 image tiles with detected transient objects : `output/[IMAGE_FOLDER]`
 
 
-Generate annotated images that highlight tiles where transient objects are detected
+#### Annotated images to highlight where transient objects are detected
 
 `python parse_results.py`
 
