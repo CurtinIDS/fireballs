@@ -57,9 +57,12 @@ mogrify -type Grayscale *jpg
 
 ### Running the detection
 
-Specify the folder name of images `[IMAGES_FOLDER]` stored in the `cache` directory
+Specify the folder name of images `[IMAGES_FOLDER]` stored in the `cache` directory within the `src/settings.py` file
 
-TODO: Kevin to update code to make this easier
+```
+# User defined settings
+IMAGES_FOLDER_NAME = '[IMAGES_FOLDER]'
+```
 
 The model files are located within the `models` folder. The default detection model used is `models/transients`
 
@@ -67,14 +70,20 @@ Classify the images:
 
 `python classify_images.py`
 
+Outputs:
+
+* CSV containing detection coordinates: `results/[IMAGES_FOLDER].csv`
+* Individual detected tile images: `output/[IMAGE_FOLDER`
+
+
 Generate annotated images that highlight tiles where transient objects are detected
 
 `python parse_results.py`
 
-Result files:
+Outputs:
 
-* CSV containing detection coordinates: `results/[IMAGES_FOLDER].csv`
 * Annotated images with highlighted detection tiles: `results/[IMAGE_FOLDER]/`
+
 
 ### Training the model
 
