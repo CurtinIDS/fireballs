@@ -1,6 +1,6 @@
 """
 Parse the fireballs detection results and highlight tiles containing 
-transient objects within the images. 
+transient objects within images 
 
 """
 from __future__ import print_function
@@ -14,11 +14,7 @@ import settings as s
 
 from scipy import misc
 
-FOLDER_NAME = 'test'
-SOURCE_FOLDER = s.CACHE_DIRECTORY + FOLDER_NAME + '/'
-RESULTS_FOLDER = s.RESULTS_DIRECTORY + FOLDER_NAME
-RESULTS_FILE = s.RESULTS_DIRECTORY + FOLDER_NAME + '.csv'
-# Brightness factor to increase tiles containing transient objects 
+# Brightness factor used to highlight tiles that contain transient objects
 BRIGHTNESS_FACTOR = 30
 
 
@@ -32,16 +28,16 @@ def main():
     print('\nLoad results data and prepare images:')
 
     # Read the results file
-    df = pd.read_csv(RESULTS_FILE)
+    df = pd.read_csv(s.RESULTS_FILE)
  
     # Create a folder to store the results annotated images
-    create_folder(RESULTS_FOLDER)
+    create_folder(s.RESULTS_FOLDER)
 
     # Copy the existing files across
     images = df['image'].unique()
-    copy_files(images, SOURCE_FOLDER, RESULTS_FOLDER)
+    copy_files(images, s.IMAGES_FOLDER, s.RESULTS_FOLDER)
 
-    print('  file: %s' % (RESULTS_FILE))
+    print('  file: %s' % (s.RESULTS_FILE))
     print('  # images: %d' % (len(images)))
     print('  # tiles: %d' % (len(df)))
     print('  time taken: %.3f seconds' % (time.time() - data_load_time))
@@ -54,7 +50,7 @@ def main():
     print('\nAnnotate images:')
 
     # Get the dimensions of each tile based on the first image
-    image = misc.imread(RESULTS_FOLDER + '/' + df.iloc[0]['image'])
+    image = misc.imread(s.RESULTS_FOLDER + '/' + df.iloc[0]['image'])
     height = int(image.shape[0])
     width = int(image.shape[1])
 
@@ -66,7 +62,7 @@ def main():
     for image in images:
     
         # Load the image
-        image_filename = RESULTS_FOLDER + '/' + image
+        image_filename = s.RESULTS_FOLDER + '/' + image
         image_data = misc.imread(image_filename)
 
         # retrieve all the tiles containing transient objects in the image
@@ -114,7 +110,7 @@ def main():
     print('\nTotal time: %.3f seconds\n' % (time.time() - start_time))
     
     print('Annotated images folder:')
-    print('  %s/\n' % (RESULTS_FOLDER))
+    print('  %s/\n' % (s.RESULTS_FOLDER))
 
 
 def create_folder(name):

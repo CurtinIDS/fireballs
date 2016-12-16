@@ -19,12 +19,13 @@ from tflearn.layers.estimator import regression
 from tflearn.layers.normalization import local_response_normalization
 from tflearn.data_preprocessing import ImagePreprocessing
 
+# Incrementally train from an existing model
 LOAD_EXISTING_MODEL = False
-EXISTING_MODEL = s.MODELS_DIRECTORY + 'exp3'
+EXISTING_MODEL = s.MODELS_FOLDER + 'experiment/exp3'
+# New trained model name
 MODEL_NAME = 'synthetic'
-CHECKPOINT_FOLDER = s.OUTPUT_DIRECTORY + MODEL_NAME
-TRAINING_FOLDER = s.SYNTHETIC_DIRECTORY + 'training'
-VALIDATION_FOLDER = s.SYNTHETIC_DIRECTORY + 'validation'
+# Store model checkpoint files
+CHECKPOINT_FOLDER = s.OUTPUT_FOLDER + MODEL_NAME
 
 
 def main(): 
@@ -39,8 +40,8 @@ def main():
     print('\nLoad and prepare dataset:')
 
     # Load the training and validation datasets
-    X, y = load_images(TRAINING_FOLDER)
-    X_val, y_val = load_images(VALIDATION_FOLDER)
+    X, y = load_images(s.TRAINING_FOLDER)
+    X_val, y_val = load_images(s.VALIDATION_FOLDER)
     
     # Normalise the image data
     image_prep = ImagePreprocessing()

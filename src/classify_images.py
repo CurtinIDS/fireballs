@@ -21,13 +21,11 @@ from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.estimator import regression
 from tflearn.data_preprocessing import ImagePreprocessing
 
-EXPERIMENT_NAME = 'exp5'
-MODEL_FILE = s.MODELS_DIRECTORY + 'transients'
-IMAGES_FOLDER = s.CACHE_DIRECTORY + 'astrosmall01'
-OUTPUT_FOLDER = s.OUTPUT_DIRECTORY + 'test'
+# Threshold to decide if a tile contains a transient object (e.g. > 50% confidence score)
 CONFIDENCE_THRESHOLD = 0.5
+# Do not run the detection model on tiles with average brightness over a specified threshold
+# Extremely bright tiles will generate false detections
 TILE_BRIGHTNESS_THRESHOLD = 150
-RESULTS_FILE = s.RESULTS_DIRECTORY + EXPERIMENT_NAME + '.csv'
 
 
 def main():
@@ -42,7 +40,7 @@ def main():
 
     # Load annotations
     # Retrieve file locations of images in the dataset
-    images = glob.glob(IMAGES_FOLDER + '/*.jpg')
+    images = glob.glob(s.IMAGES_FOLDER + '/*.jpg')
 
     # Retrieve the class labels
     labels = s.LABELS
@@ -80,9 +78,9 @@ def main():
 
     # load the convolutional neural network model
     model = tflearn.DNN(network)
-    model.load(MODEL_FILE)
+    model.load(s.MODEL_FILE)
 
-    print('  file: %s' % (MODEL_FILE))
+    print('  file: %s' % (s.MODEL_FILE))
     print('  time taken: %.3f seconds' % (time.time() - model_load_time))
 
 
@@ -92,7 +90,7 @@ def main():
     classify_time = time.time()
     print('\nClassify images:')
 
-    output_df = predict(IMAGES_FOLDER, OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model)
+    output_df = predict(s.IMAGES_FOLDER, OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model)
 
     # print('  predictions:')
     # for index, value in class_counts_df.iteritems():

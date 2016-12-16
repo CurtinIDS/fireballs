@@ -27,11 +27,6 @@ BRIGHTNESS_THRESHOLD = BRIGHTNESS_THRESHOLD_VALUES[STREAK_BRIGHTNESS_INDEX]
 # Seed numbers used for random number generator to repliciating experimental results
 TRAINING_SEED = STREAK_BRIGHTNESS_INDEX + 5656
 VALIDATION_SEED = STREAK_BRIGHTNESS_INDEX + 2961
-# original images with NO transient objects
-SOURCE_FOLDER = s.SYNTHETIC_DIRECTORY + 'source'
-TEMP_FOLDER = s.SYNTHETIC_DIRECTORY + 'temp' 
-TRAINING_FOLDER = s.SYNTHETIC_DIRECTORY + 'training'
-VALIDATION_FOLDER = s.SYNTHETIC_DIRECTORY + 'validation'
 
 
 def main(): 
@@ -46,14 +41,14 @@ def main():
     print('\nPrepare dataset:')
 
     # Create folders for generating storing generated synthetic images 
-    create_folder(TEMP_FOLDER)
-    create_folder(TRAINING_FOLDER, labels=True)
-    create_folder(VALIDATION_FOLDER, labels=True)
+    create_folder(s.TEMP_FOLDER)
+    create_folder(s.TRAINING_FOLDER, labels=True)
+    create_folder(s.VALIDATION_FOLDER, labels=True)
 
     # Copy source images to a temporary folder
     count = 0
-    for image in os.listdir(SOURCE_FOLDER):
-        copyfile(SOURCE_FOLDER + '/' + image, TEMP_FOLDER + '/' + str(count) + '.jpg')
+    for image in os.listdir(s.SOURCE_FOLDER):
+        copyfile(s.SOURCE_FOLDER + '/' + image, s.TEMP_FOLDER + '/' + str(count) + '.jpg')
         count += 1
 
     print('  # source images: %d ' % (count - 1))
@@ -66,7 +61,7 @@ def main():
     training_start_time = time.time()
     print('\nGenerate training images:')
 
-    generate_images(TRAINING_FOLDER, TRAINING_SAMPLES, TRAINING_SEED)
+    generate_images(s.TRAINING_FOLDER, TRAINING_SAMPLES, TRAINING_SEED)
 
     print('  # training images generated: %d ' % (TRAINING_SAMPLES))
     print('  time taken: %.3f seconds' % (time.time() - training_start_time))
@@ -78,7 +73,7 @@ def main():
     validation_start_time = time.time()
     print('\nGenerate validation images:')
 
-    generate_images(VALIDATION_FOLDER, VALIDATION_SAMPLES, VALIDATION_SEED)
+    generate_images(s.VALIDATION_FOLDER, VALIDATION_SAMPLES, VALIDATION_SEED)
 
     print('  # validation images generated: %d ' % (VALIDATION_SAMPLES))
     print('  time taken: %.3f seconds' % (time.time() - validation_start_time))
@@ -95,7 +90,7 @@ def generate_images(folder, samples, random_seed):
 
     # Seed the random number generator   
     seed(random_seed)
-    image_len = len(os.listdir(SOURCE_FOLDER))
+    image_len = len(os.listdir(s.SOURCE_FOLDER))
  
     for i in range(samples):
 
@@ -103,7 +98,7 @@ def generate_images(folder, samples, random_seed):
         myrand = randrange(1, image_len)
 
         # 0.008 - 0.013 seconds to load file
-        im = Image.open(TEMP_FOLDER + '/' + str(myrand) + '.jpg')
+        im = Image.open(s.TEMP_FOLDER + '/' + str(myrand) + '.jpg')
         X = im.size[0]
         Y = im.size[1]
         
