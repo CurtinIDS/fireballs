@@ -148,7 +148,6 @@ Notes:
 
 Specify the folder name of the training images stored within `src/settings.py` file by updating the `TRAINING_DATASET_FOLDER` variable.
 
-`TRAINING_DATASET_FOLDER = '[TRAINING_DATASET_FOLDER]'`
 
 #### Training
 
