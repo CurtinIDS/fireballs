@@ -90,6 +90,10 @@ def main():
     classify_time = time.time()
     print('\nClassify images:')
 
+    # Create the output folder
+    create_folder(s.OUTPUT_FOLDER)
+
+    # Perform transient object detection
     output_df = predict(s.IMAGES_FOLDER, s.OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model)
 
     # print('  predictions:')
@@ -212,6 +216,16 @@ def predict(images_folder, output_folder, threshold, model):
             print (filename + '--->0')
 
     return results
+
+
+def create_folder(name, labels=False):
+    ''' Create the folder for generating synthetic images '''
+    if os.path.exists(name):
+        # Remove the existing folder
+        shutil.rmtree(name)
+    
+    # Create the folder
+    os.makedirs(name)
 
 
 if __name__ == '__main__':
