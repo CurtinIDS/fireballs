@@ -31,11 +31,11 @@ def main():
     df = pd.read_csv(s.RESULTS_FILE)
  
     # Create a folder to store the results annotated images
-    create_folder(s.RESULTS_FOLDER)
+    create_folder(s.MODEL_RESULTS_FOLDER)
 
     # Copy the existing files across
     images = df['image'].unique()
-    copy_files(images, s.IMAGES_FOLDER, s.RESULTS_FOLDER)
+    copy_files(images, s.IMAGES_FOLDER, s.MODEL_RESULTS_FOLDER)
 
     print('  file: %s' % (s.RESULTS_FILE))
     print('  # images: %d' % (len(images)))
@@ -50,7 +50,7 @@ def main():
     print('\nAnnotate images:')
 
     # Get the dimensions of each tile based on the first image
-    image = misc.imread(s.RESULTS_FOLDER + '/' + df.iloc[0]['image'])
+    image = misc.imread(s.MODEL_RESULTS_FOLDER + '/' + df.iloc[0]['image'])
     height = int(image.shape[0])
     width = int(image.shape[1])
 
@@ -62,7 +62,7 @@ def main():
     for image in images:
     
         # Load the image
-        image_filename = s.RESULTS_FOLDER + '/' + image
+        image_filename = s.MODEL_RESULTS_FOLDER + '/' + image
         image_data = misc.imread(image_filename)
 
         # retrieve all the tiles containing transient objects in the image
@@ -110,7 +110,7 @@ def main():
     print('\nTotal time: %.3f seconds\n' % (time.time() - start_time))
     
     print('Annotated images folder:')
-    print('  %s/\n' % (s.RESULTS_FOLDER))
+    print('  %s/\n' % (s.MODEL_RESULTS_FOLDER))
 
 
 def create_folder(name):

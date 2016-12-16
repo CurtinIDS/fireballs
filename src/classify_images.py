@@ -9,6 +9,7 @@ import os
 import glob
 import math
 import time
+import shutil
 import tflearn
 import numpy as np
 import pandas as pd
@@ -91,10 +92,10 @@ def main():
     print('\nClassify images:')
 
     # Create the output folder
-    create_folder(s.OUTPUT_FOLDER)
+    create_folder(s.MODEL_OUTPUT_FOLDER)
 
     # Perform transient object detection
-    output_df = predict(s.IMAGES_FOLDER, s.OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model)
+    output_df = predict(s.IMAGES_FOLDER, s.MODEL_OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model)
 
     # print('  predictions:')
     # for index, value in class_counts_df.iteritems():
@@ -110,7 +111,7 @@ def main():
     output_df = output_df[['image', 'confidence', 'x0', 'y0', 'x1', 'y1', 'tile']]
 
     # Write output to results file
-    output_df.to_csv(RESULTS_FILE, index=False)
+    output_df.to_csv(s.RESULTS_FILE, index=False)
 
 
     # 
@@ -120,7 +121,7 @@ def main():
     print('\nTotal time: %.3f seconds\n' % (time.time() - start_time))
 
     print('Generated file:')
-    print('  %s\n' % (RESULTS_FILE))
+    print('  %s\n' % (s.RESULTS_FILE))
 
 
 def tile(filename, width, height):
