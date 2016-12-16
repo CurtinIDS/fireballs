@@ -148,10 +148,11 @@ Notes:
 
 Specify the folder name of the training images stored within `src/settings.py` file by updating the `TRAINING_DATASET_FOLDER` variable.
 
+`TRAINING_DATASET_FOLDER = '[TRAINING_DATASET_FOLDER]'`
 
 #### Training
 
-Specify the conditions of training the model by updating variables in the `src/train_model.py` file. 
+Specify conditions for training the model by updating variables in the `src/train_model.py` file. 
 
 ```
 # Incrementally train from an existing model
