@@ -96,7 +96,10 @@ The model files are located within the `models` folder. The default detection mo
 
 #### Classify the images
 
-`python classify_images.py`
+```
+cd src
+python classify_images.py
+```
 
 Outputs:
 
@@ -104,13 +107,16 @@ Outputs:
 * 200x200 image tiles with detected transient objects : `output/[IMAGE_FOLDER]`
 
 
-#### Annotated images to highlight where transient objects are detected
+#### Annotated images by highlighting where objects are detected
 
-`python parse_results.py`
+```
+cd src
+python parse_results.py
+```
 
 Outputs:
 
-* Annotated images with highlighted detection tiles: `results/[IMAGE_FOLDER]/`
+* Annotated images: `results/[IMAGE_FOLDER]/`
 
 
 ### Training the model
