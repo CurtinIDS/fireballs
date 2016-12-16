@@ -122,8 +122,75 @@ Outputs:
 
 ### Training the model
 
+#### Prepare the training dataset
+
+A training and validation dataset of images must be provided for (re)training the model. The dataset folder `[TRAINING_DATASET_FOLDER]` and following subfolders must be created within the `data` directory. 
+
+```
+data/
+  [TRAINING_DATASET_FOLDER]/
+    training/
+      0/
+      1/
+    validation/
+      0/
+      1/
+```
+
+Notes:
+
+* `0/` images that do NOT contain any transient objects
+* `1/` images with transient objects
+* images must be:
+ * 200x200 pixels
+ * grayscale
+* a validation dataset that is 10% the size of the training dataset was used in experiments  
+
+Specify the folder name of the training images stored within `src/settings.py` file by updating the `TRAINING_DATASET_FOLDER` variable.
+
+
+#### Training
+
+Specify the conditions of (re)training the model by updating variables in the `src/train_model.py` file. 
+
+```
+# Incrementally train from an existing model
+LOAD_EXISTING_MODEL = False
+EXISTING_MODEL = s.MODELS_FOLDER + 'experiment/exp3'
+# New trained model name
+MODEL_NAME = 'synthetic'
+# Store model checkpoint files
+CHECKPOINT_FOLDER = s.OUTPUT_FOLDER + MODEL_NAME
+```
+
+Train the model
+
 `python train_model.py`
+
+Notes:
+
+* Setting `LOAD_EXISTING_MODEL = True` and providing a `EXISTING_MODEL` file allows the model to be traing using the weights of an existing model rather than training from scratch
+* Trained model checkpoint files are saved to `output/[MODEL_NAME]`
+ * copy the last checkpoint model file to `models/` if you wish to use it for classifying images
+  * e.g. `cp output/[MODEL_NAME]/-5032 models/[NEW_MODEL_NAME]`
+  * `MODEL_FILE_NAME = '[NEW_MODEL_NAME]'` should then be specified within `settings.py`
+
 
 ### Generating synthetic datasets
 
+A dataset of background images containing no transient objects must be provided to generate a synthetic dataset for training the model. Create the folders `synthetic/source` within the `data` directory and copy the background images to the source folder. 
+
+Modify variables in `create_dataset.py` to adjust how the dataset is created:
+* `TRAINING_SAMPLES`
+* `VALIDATION_SAMPLES`
+* `BIAS`
+* `BRIGHTNESS_VALUES`
+* `BRIGHTNESS_THRESHOLD_VALUES`
+
+Generate the synthetic dataset:
+
 `python create_dataset.py`
+
+### Visualising the model
+
+`jupyter-noteboook src/visualise_cnn.ipynb`
