@@ -84,15 +84,16 @@ mogrify -type Grayscale *jpg
 
 ### Running the detection
 
-Specify the folder name of images `[IMAGES_FOLDER]` stored in the `cache` directory within the `src/settings.py` file
+Specify the folder name of images `[IMAGES_FOLDER]` stored in the `cache` directory within the `src/settings.py` file by updating the `IMAGES_FOLDER_NAME` variable.
 
 ```
 # User defined settings
 IMAGES_FOLDER_NAME = '[IMAGES_FOLDER]'
+MODEL_FILE_NAME = 'transients'
 ...
 ```
 
-The model files are located within the `models` folder. The default detection model used is `models/transients`
+Model files are located within the `models` folder. The default detection model is `models/transients` but a different model can be used by updating the `MODEL_FILE_NAME` variable in `src/settings.py`.
 
 #### Classify the images
 
