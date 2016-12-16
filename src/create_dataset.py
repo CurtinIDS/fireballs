@@ -47,8 +47,8 @@ def main():
 
     # Copy source images to a temporary folder
     count = 0
-    for image in os.listdir(s.SOURCE_FOLDER):
-        copyfile(s.SOURCE_FOLDER + '/' + image, s.DATASET_TEMP_FOLDER + '/' + str(count) + '.jpg')
+    for image in os.listdir(s.DATASET_SOURCE_FOLDER):
+        copyfile(s.DATASET_SOURCE_FOLDER + '/' + image, s.DATASET_TEMP_FOLDER + '/' + str(count) + '.jpg')
         count += 1
 
     print('  # source images: %d ' % (count - 1))
@@ -90,7 +90,7 @@ def generate_images(folder, samples, random_seed):
 
     # Seed the random number generator   
     seed(random_seed)
-    image_len = len(os.listdir(s.SOURCE_FOLDER))
+    image_len = len(os.listdir(s.DATASET_SOURCE_FOLDER))
  
     for i in range(samples):
 

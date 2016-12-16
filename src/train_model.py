@@ -21,9 +21,10 @@ from tflearn.data_preprocessing import ImagePreprocessing
 
 # Incrementally train from an existing model
 LOAD_EXISTING_MODEL = False
+# exp5 = best model generated as of Nov 2016
 EXISTING_MODEL = s.MODELS_FOLDER + 'experiment/exp5'
 # New trained model name
-MODEL_NAME = 'synthetic'
+MODEL_NAME = 'new_model'
 # Store model checkpoint files
 CHECKPOINT_FOLDER = s.OUTPUT_FOLDER + MODEL_NAME
 

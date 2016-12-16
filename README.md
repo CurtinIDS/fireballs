@@ -104,7 +104,7 @@ python classify_images.py
 
 Outputs:
 
-* CSV containing detection coordinates: `results/[IMAGES_FOLDER].csv`
+* CSV file containing detection coordinates: `results/[IMAGES_FOLDER].csv`
 * 200x200 image tiles with detected transient objects : `output/[IMAGE_FOLDER]`
 
 
@@ -124,7 +124,7 @@ Outputs:
 
 #### Prepare the training dataset
 
-A training and validation dataset of images must be provided for (re)training the model. The dataset folder `[TRAINING_DATASET_FOLDER]` and following subfolders must be created within the `data` directory. 
+A training and validation dataset of images must be provided for training the model. The dataset folder `[TRAINING_DATASET_FOLDER]` and following subfolders must be created within the `data` directory. 
 
 ```
 data/
@@ -151,12 +151,12 @@ Specify the folder name of the training images stored within `src/settings.py` f
 
 #### Training
 
-Specify the conditions of (re)training the model by updating variables in the `src/train_model.py` file. 
+Specify the conditions of training the model by updating variables in the `src/train_model.py` file. 
 
 ```
 # Incrementally train from an existing model
 LOAD_EXISTING_MODEL = False
-EXISTING_MODEL = s.MODELS_FOLDER + 'experiment/exp3'
+EXISTING_MODEL = s.MODELS_FOLDER + 'experiment/exp5'
 # New trained model name
 MODEL_NAME = 'synthetic'
 # Store model checkpoint files
@@ -178,7 +178,7 @@ Notes:
 
 ### Generating synthetic datasets
 
-A dataset of background images containing no transient objects must be provided to generate a synthetic dataset for training the model. Create the folders `synthetic/source` within the `data` directory and copy the background images to the source folder. 
+A dataset of background images containing no transient objects must be provided to generate a synthetic dataset for training the model. Create folders `[SYNTHETIC_DATASET_FOLDER]` and `[SYNTHETIC_DATASET_FOLDER]/source` within the `data` directory and copy the background images to the `source` folder. 
 
 Modify variables in `create_dataset.py` to adjust how the dataset is created:
 * `TRAINING_SAMPLES`
@@ -190,6 +190,9 @@ Modify variables in `create_dataset.py` to adjust how the dataset is created:
 Generate the synthetic dataset:
 
 `python create_dataset.py`
+
+If you want to use the synthetically generated dataset for training the model then modify `settings.py` and uncomment `# TRAINING_DATASET_FOLDER = SYNTHETIC_DATASET_FOLDER`.
+
 
 ### Visualising the model
 
