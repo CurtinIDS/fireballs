@@ -4,6 +4,8 @@ cache/*
 data/*
 output/*
 tf_files/*
+results/*
+models/*
 .ipynb_checkpoints*
 
 # OS generated files
@@ -15,3 +17,6 @@ tf_files/*
 Icon?
 thumbs.db
 Thumbs.db
+
+# temp files
+*~
