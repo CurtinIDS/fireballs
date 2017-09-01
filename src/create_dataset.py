@@ -94,6 +94,11 @@ def generate_images(folder, samples, random_seed):
  
     for i in range(samples):
 
+	#added by sean
+	if i%100==0:
+	    progress= "  " + str(i) + "/" + str(samples) + "\t" + str(math.floor(i*10000/samples)/100)+"%"
+	    print(progress)
+
         # Select a random background image without meteorites
         myrand = randrange(1, image_len)
 

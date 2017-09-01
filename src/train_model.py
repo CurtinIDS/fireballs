@@ -20,7 +20,7 @@ from tflearn.layers.normalization import local_response_normalization
 from tflearn.data_preprocessing import ImagePreprocessing
 
 # Incrementally train from an existing model
-LOAD_EXISTING_MODEL = False
+LOAD_EXISTING_MODEL = False #changed from False to True
 # exp5 = best model generated as of Nov 2016
 EXISTING_MODEL = s.MODELS_FOLDER + 'experiment/exp5'
 # New trained model name
@@ -41,8 +41,8 @@ def main():
     print('\nLoad and prepare dataset:')
 
     # Load the training and validation datasets
-    X, y = load_images(s.TRAINING_FOLDER)
-    X_val, y_val = load_images(s.VALIDATION_FOLDER)
+    X, y = load_images(s.TRAINING_FOLDER)		###########
+    X_val, y_val = load_images(s.VALIDATION_FOLDER)	###########
     
     # Normalise the image data
     image_prep = ImagePreprocessing()
@@ -79,7 +79,7 @@ def main():
     # 3. Train the convolutional neural network
     # 
     training_start_time = time.time()
-    print('\nTrain the neural network:')    
+    print('\n'+'total number of epochs: '+str(s.EPOCH)+'\n\nTraining the neural network:')    
 
     if not os.path.exists(CHECKPOINT_FOLDER):
         os.makedirs(CHECKPOINT_FOLDER)
@@ -92,8 +92,11 @@ def main():
         model.load(EXISTING_MODEL)
 
     # Train the model
-    model.fit({'input': X}, {'target': y}, validation_set=({'input': X_val}, {'target': y_val}), n_epoch=150, batch_size=30, snapshot_epoch=True, show_metric=True)
+    model.fit({'input': X}, {'target': y}, validation_set=({'input': X_val}, {'target': y_val}), n_epoch=s.EPOCH, batch_size=30, snapshot_epoch=True, show_metric=True)
 
+    timestamp=time.strftime("%Y-%m-%d_%H%M%S", time.gmtime())+"_"+str(s.EPOCH)	### time.gmtime(), not time.gmting()
+    model.save("../models/saves/SAVE_"+timestamp)				###added by sean
+    print('  saved as: ' + timestamp)
     print('  time taken: %.3f seconds' % (time.time() - training_start_time))
 
     # 

@@ -5,6 +5,7 @@ neural network model
 """
 from __future__ import print_function
 
+
 import os
 import glob
 import math
@@ -41,7 +42,7 @@ def main():
 
     # Load annotations
     # Retrieve file locations of images in the dataset
-    images = glob.glob(s.IMAGES_FOLDER + '/*.jpg')
+    images = glob.glob(s.IMAGES_FOLDER + '/*.'+s.IMAGE_TYPE)
 
     # Retrieve the class labels
     labels = s.LABELS
@@ -90,12 +91,13 @@ def main():
     # 
     classify_time = time.time()
     print('\nClassify images:')
+    print("NAME                                  EVENT  COUNT \tPROG \t AVE  \t CURR \t ETA\t\t total detections")
 
     # Create the output folder
     create_folder(s.MODEL_OUTPUT_FOLDER)
 
     # Perform transient object detection
-    output_df = predict(s.IMAGES_FOLDER, s.MODEL_OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model)
+    output_df = predict(s.IMAGES_FOLDER, s.MODEL_OUTPUT_FOLDER, CONFIDENCE_THRESHOLD, model, len(images))
 
     # print('  predictions:')
     # for index, value in class_counts_df.iteritems():
@@ -117,7 +119,7 @@ def main():
     # 
     # 5. Display messages to the console
     #
-
+    
     print('\nTotal time: %.3f seconds\n' % (time.time() - start_time))
 
     print('Generated file:')
@@ -171,17 +173,27 @@ def tile(filename, width, height):
     return image_tiles, image_coordinates
 
 
-def predict(images_folder, output_folder, threshold, model):
+def predict(images_folder, output_folder, threshold, model, total_num_images):
     ''' Returns 1 or 0 based on if transient object is present. If 1, out_filename_tilename is created '''
     # Store classification predictions and scores for images
     results = pd.DataFrame()
 
-    for file in glob.glob(images_folder + '/*.jpg'):
+    #ADDED count TO KEEP TRACK OF HOW MUCH LONGER THE PROGRAM WILL RUN FOR
+    count=0
+    total_detections=0
+    average_processing_time=0
+
+    #LOOP through the images
+    for file in glob.glob(images_folder + '/*.'+s.IMAGE_TYPE):
+	#ADDED TO HELP PREDICT REMAINING PROCESSING TIME
+	image_process_begin_time = time.time()
+
         tiles, coords = tile(file, 200, 200)
         flag = 0
 
         filename = file.split('/')[-1]
-
+	
+	# LOOP through the tiles
         for i in range(len(tiles)): 
             # Run the model to determine if this tile contains a transient object
 
@@ -196,7 +208,7 @@ def predict(images_folder, output_folder, threshold, model):
                     tile_row = int(i / 10)
                     tile_column = int(i % 10)
 
-                    output_filename = output_folder + '/out_' + filename + '_' + str(tile_row) + '_' + str(tile_column) + '.jpg'
+                    output_filename = output_folder + '/out_' + filename + '_' + str(tile_row) + '_' + str(tile_column) + '.'+s.IMAGE_TYPE
 
                     # Append the prediction to the output DataFrame
                     results = results.append({
@@ -210,11 +222,29 @@ def predict(images_folder, output_folder, threshold, model):
                         ignore_index=True)
                     misc.imsave(output_filename, tiles[i])
                     flag = 1
+	#
+	#everything from this point down in this function is for display purposes (appart from return results)
+	#
+	count=count+1
 
+	processing_time=(time.time()-image_process_begin_time)	
+	average_processing_time=average_processing_time*(count-1)/(count) + processing_time/count
+
+	time_taken=str( math.floor( 100*(average_processing_time) )/100) +"s\t "
+	time_taken=time_taken+str( math.floor( 100*(processing_time) )/100) +"s"
+	
+	progress= str(count) + "/" + str(total_num_images) + "\t" + str(math.floor(count*10000/total_num_images)/100)+"%"
+	progress= progress +"\t "+ time_taken+"\t "
+	progress= progress + str( int( (average_processing_time*(total_num_images-count)/60)/60 ) ) +"h"
+	progress= progress + str( int( (average_processing_time*(total_num_images-count)/60)%60 ) ) +"m"
+	progress= progress + str( int(  average_processing_time*(total_num_images-count)%60     ) ) +"s"
+	progress= progress +"  \t "+str(total_detections)
         if flag:
-            print (filename + '--->1')
+	    total_detections = total_detections+1
+            print (filename + '  FOUND  ' + progress)
         else:
-            print (filename + '--->0')
+            print (filename + '  -----  ' + progress)
+    print("\nTotal detections: "+str(total_detections) +"\n")
 
     return results
 

@@ -3,9 +3,10 @@ Global settings for the project
 
 """
 # User defined settings
-IMAGES_FOLDER_NAME = 'test'
-MODEL_FILE_NAME = 'transients'
-TRAINING_DATASET_FOLDER = 'temp'
+IMAGES_FOLDER_NAME = 'ALL_SET_2'
+IMAGE_TYPE = "jpeg"
+MODEL_FILE_NAME = "saves/SAVE_2017-06-01_042925_400"
+TRAINING_DATASET_FOLDER = 'synthetic'
 SYNTHETIC_DATASET_FOLDER = 'synthetic'
 # Set the training dataset folder to use the synthetic dataset folder if
 # you want to train using synthetically generated images
@@ -31,11 +32,12 @@ RESULTS_FILE = MODEL_RESULTS_FOLDER + '.csv'
 LABELS = ['other', 'transients']
 
 # Training dataset settings
+EPOCH = 100
 TRAINING_FOLDER = TRAINING_FOLDER_PATH + 'training'
 VALIDATION_FOLDER = TRAINING_FOLDER_PATH + 'validation'
 
 # Synthetic dataset settings
-DATASET_SOURCE_FOLDER = SYNTHETIC_FOLDER + 'source'
+DATASET_SOURCE_FOLDER = SYNTHETIC_FOLDER + 'sample' # location where sample dataset is added
 DATASET_TEMP_FOLDER = SYNTHETIC_FOLDER + 'temp' 
-DATASET_TRAINING_FOLDER = SYNTHETIC_FOLDER + 'training'
+DATASET_TRAINING_FOLDER = SYNTHETIC_FOLDER + 'training' # location where training images are kept
 DATASET_VALIDATION_FOLDER = SYNTHETIC_FOLDER + 'validation'
